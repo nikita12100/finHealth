@@ -3,8 +3,8 @@ use teloxide::dispatching::dialogue::GetChatId;
 use teloxide::payloads::SendMessageSetters;
 use teloxide::prelude::{CallbackQuery, Requester};
 use crate::{make_keyboard, start_again, HandlerResult, MyDialogue, State};
-use crate::dao::Portfolio;
-use crate::db::DataBase;
+use crate::db::dao::Portfolio;
+use crate::db::db::DataBase;
 
 pub struct UpdatePortfolioButton;
 

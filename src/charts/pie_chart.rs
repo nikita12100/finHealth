@@ -5,7 +5,6 @@ use std::io::Cursor;
 use image::{ImageBuffer, ImageFormat, Rgb};
 use teloxide::types::InputFile;
 
-
 pub struct PieChart {}
 impl PieChart {
     const WIDTH: u32 = 600;

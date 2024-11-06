@@ -3,10 +3,10 @@ use teloxide::dispatching::dialogue::GetChatId;
 use teloxide::payloads::SendMessageSetters;
 use teloxide::prelude::{CallbackQuery, Requester};
 use crate::{make_keyboard, start_again, HandlerResult, MyDialogue, State};
-use crate::db::DataBase;
-use crate::get_portfolio_buttons::GetPortfolioButtons;
-use crate::mock_data::MockData;
-use crate::update_portfolio_buttons::UpdatePortfolioButton;
+use crate::buttons::get_portfolio_buttons::GetPortfolioButtons;
+use crate::buttons::update_portfolio_buttons::UpdatePortfolioButton;
+use crate::db::db::DataBase;
+use crate::utils::mock_data::MockData;
 
 pub struct StartButton;
 

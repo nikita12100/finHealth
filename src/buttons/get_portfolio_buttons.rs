@@ -1,13 +1,10 @@
-use std::io::Read;
 use teloxide::Bot;
 use teloxide::dispatching::dialogue::GetChatId;
 use teloxide::prelude::{CallbackQuery, Requester};
-use teloxide::types::InputFile;
-use teloxide::types::PassportElementErrorUnspecifiedType::File;
-use crate::{make_keyboard, start_again, HandlerResult, MyDialogue, State};
-use crate::dao::Portfolio;
-use crate::db::DataBase;
-use crate::pie_chart::PieChart;
+use crate::{start_again, HandlerResult, MyDialogue};
+use crate::charts::pie_chart::PieChart;
+use crate::db::dao::Portfolio;
+use crate::db::db::DataBase;
 
 pub struct GetPortfolioButtons {}
 

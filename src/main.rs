@@ -1,15 +1,8 @@
-mod dao;
-mod currency;
+mod buttons;
+mod charts;
 mod db;
-mod start_buttons;
-mod update_portfolio_buttons;
-mod mock_data;
-mod line_series_example;
-mod pie_chart;
-mod get_portfolio_buttons;
+mod utils;
 
-use std::num::ParseIntError;
-use chrono::{TimeZone, Utc};
 use teloxide::{
     dispatching::dialogue::{
         serializer::Json,
@@ -18,17 +11,14 @@ use teloxide::{
     prelude::*,
     utils::command::BotCommands,
 };
-use crate::dao::{Account, Portfolio};
 use rusqlite::Result;
-use teloxide::types::{InlineKeyboardButton, InlineKeyboardMarkup, InputFile};
-use crate::currency::Currency;
-use crate::db::DataBase;
-use strum::IntoEnumIterator;
-use teloxide::types::PassportElementErrorUnspecifiedType::File;
-use crate::get_portfolio_buttons::handler_get_portfolio_btn;
-// 0.17.1
-use crate::start_buttons::{handler_start_btn, StartButton};
-use crate::update_portfolio_buttons::{handler_update_balance_btn, handler_update_portfolio_btn};
+use teloxide::types::{InlineKeyboardButton, InlineKeyboardMarkup};
+use crate::buttons::get_portfolio_buttons::handler_get_portfolio_btn;
+use crate::buttons::start_buttons::{handler_start_btn, StartButton};
+use crate::buttons::update_portfolio_buttons::{handler_update_balance_btn, handler_update_portfolio_btn};
+use crate::db::dao::{Account, Portfolio};
+use crate::db::db::DataBase;
+use crate::utils::currency::Currency;
 
 type MyDialogue = Dialogue<State, ErasedStorage<State>>;
 type MyStorage = std::sync::Arc<ErasedStorage<State>>;

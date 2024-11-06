@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use chrono::serde::ts_seconds;
-use crate::currency::Currency;
+use crate::utils::currency::Currency;
 
 #[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct BalanceTimed {

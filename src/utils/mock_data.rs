@@ -1,5 +1,5 @@
-use crate::currency::Currency;
-use crate::dao::{Account, Portfolio};
+use crate::db::dao::{Account, Portfolio};
+use crate::utils::currency::Currency;
 
 pub struct MockData {}
 

@@ -1,6 +1,5 @@
 use rusqlite::{named_params, Connection};
-use teloxide::prelude::ChatId;
-use crate::dao::Portfolio;
+use crate::db::dao::Portfolio;
 
 type HandlerResult<T> = rusqlite::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
