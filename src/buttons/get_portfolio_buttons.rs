@@ -2,7 +2,7 @@ use teloxide::Bot;
 use teloxide::dispatching::dialogue::GetChatId;
 use teloxide::prelude::{CallbackQuery, Requester};
 use crate::{start_again, HandlerResult, MyDialogue};
-use crate::db::dao::Portfolio;
+use crate::db::portfolio::Portfolio;
 use crate::db::db::DataBase;
 
 pub struct GetPortfolioButtons {}

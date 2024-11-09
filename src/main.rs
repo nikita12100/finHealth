@@ -13,12 +13,15 @@ use teloxide::{
 };
 use rusqlite::Result;
 use teloxide::types::{InlineKeyboardButton, InlineKeyboardMarkup};
+use crate::buttons::edit_portfolio_buttons::handler_update_portfolio_btn;
 use crate::buttons::get_portfolio_buttons::handler_get_portfolio_btn;
+use crate::buttons::set_category_buttons::{handler_category_btn, Category};
 use crate::buttons::start_buttons::{handler_start_btn, StartButton};
 use crate::buttons::update_account_buttons::handler_update_account_btn;
-use crate::buttons::update_portfolio_buttons::{handler_update_balance_btn, handler_update_portfolio_btn};
-use crate::db::dao::{Account, Portfolio};
+use crate::buttons::update_portfolio_buttons::handler_update_balance_btn;
+use crate::db::account::Account;
 use crate::db::db::DataBase;
+use crate::db::portfolio::Portfolio;
 use crate::utils::currency::Currency;
 
 type MyDialogue = Dialogue<State, ErasedStorage<State>>;
@@ -29,14 +32,21 @@ type HandlerResult = Result<(), Box<dyn std::error::Error + Send + Sync>>;
 pub enum State {
     #[default]
     Start,
-    /// Listen buttons click
-    ListenStartButtons,
-    ListenGetPortfolioButtons,
-    ListenUpdatePortfolioButtons,
-    /// Listen client data from chat
+    // Listen buttons click
+    ListenStartButtonsCallback,
+    ListenGetPortfolioButtonsCallback,
+    ListenEditPortfolioButtonsCallback,
+    ListenCategoryCallback {
+        balance_name: String,
+        outcome: u32,
+    },
+    // Listen client data from chat
     ListenBalanceName,
     ListenNewBalanceName,
-    /// Get client data from chat for each listen
+    ListenBalanceAmountFor(String),
+    ListenBalanceIncomeFor(String),
+    ListenBalanceOutcomeFor(String),
+    // Get client data from chat for each listen
     GotListenBalanceNameListenAccountButtons(String),
     GotNewBalanceName(String),
 }
@@ -69,14 +79,18 @@ async fn main() {
                 .branch(dptree::case![State::Start].filter_command::<Command>().endpoint(start))
                 .branch(dptree::case![State::ListenNewBalanceName].endpoint(listen_new_balance_name))
                 .branch(dptree::case![State::GotNewBalanceName(new_balance_name)].endpoint(listen_new_balance_amount))
+                .branch(dptree::case![State::ListenBalanceAmountFor(balance_name)].endpoint(listen_balance_new_amount))
+                .branch(dptree::case![State::ListenBalanceIncomeFor(balance_name)].endpoint(listen_balance_income_amount))
+                .branch(dptree::case![State::ListenBalanceOutcomeFor(balance_name)].endpoint(listen_balance_outcome_amount))
                 .branch(dptree::endpoint(invalid_command))
         )
         .branch(
             Update::filter_callback_query()
                 .enter_dialogue::<CallbackQuery, ErasedStorage<State>, State>()
-                .branch(dptree::case![State::ListenStartButtons].endpoint(handler_start_btn))
-                .branch(dptree::case![State::ListenGetPortfolioButtons].endpoint(handler_get_portfolio_btn))
-                // .branch(dptree::case![State::ListenUpdatePortfolioButtons].endpoint(handler_update_portfolio_btn))
+                .branch(dptree::case![State::ListenStartButtonsCallback].endpoint(handler_start_btn))
+                .branch(dptree::case![State::ListenGetPortfolioButtonsCallback].endpoint(handler_get_portfolio_btn))
+                .branch(dptree::case![State::ListenEditPortfolioButtonsCallback].endpoint(handler_update_portfolio_btn))
+                .branch(dptree::case![State::ListenCategoryCallback{balance_name, outcome}].endpoint(handler_category_btn))
                 .branch(dptree::case![State::ListenBalanceName].endpoint(handler_update_balance_btn))
                 .branch(dptree::case![State::GotListenBalanceNameListenAccountButtons(balance_name)].endpoint(handler_update_account_btn))
 
@@ -94,7 +108,7 @@ async fn main() {
 async fn start(bot: Bot, dialogue: MyDialogue, msg: Message) -> HandlerResult {
     let intro_text = "Привет, я умею ...\nВыбери действие:";
 
-    dialogue.update(State::ListenStartButtons).await?;
+    dialogue.update(State::ListenStartButtonsCallback).await?;
     bot.send_message(msg.chat.id, intro_text).reply_markup(make_keyboard(1, StartButton::VALUES.to_vec())).await?;
 
     Ok(())
@@ -103,7 +117,7 @@ async fn start(bot: Bot, dialogue: MyDialogue, msg: Message) -> HandlerResult {
 async fn start_again(bot: Bot, dialogue: MyDialogue, chat_id: ChatId) -> HandlerResult {
     let intro_text = "Выбери действие:";
 
-    dialogue.update(State::ListenStartButtons).await?;
+    dialogue.update(State::ListenStartButtonsCallback).await?;
     bot.send_message(chat_id, intro_text).reply_markup(make_keyboard(1, StartButton::VALUES.to_vec())).await?;
 
     Ok(())
@@ -136,6 +150,7 @@ async fn handler_print(bot: Bot, q: CallbackQuery) -> HandlerResult {
 
     Ok(())
 }
+
 
 async fn listen_new_balance_name(
     bot: Bot,
@@ -185,10 +200,46 @@ async fn listen_balance_new_amount(
         Ok(new_balance) => {
             let mut portfolio = Portfolio::get(msg.chat.id.0).unwrap_or(Portfolio::empty());
 
-            portfolio.add_account_record(&*balance_name, new_balance);
+            portfolio.get_account_mut(&*balance_name).unwrap().set_balance_amount(new_balance);
             portfolio.save(msg.chat.id.0)?;
             bot.send_message(msg.chat.id, format!("portfolio updated {:#?}", portfolio)).await?;
             start_again(bot, dialogue, msg.chat.id).await?;
+        }
+        Err(_) => { todo!() }
+    }
+    Ok(())
+}
+
+async fn listen_balance_income_amount(
+    bot: Bot,
+    dialogue: MyDialogue,
+    balance_name: String,
+    msg: Message,
+) -> HandlerResult {
+    match msg.text().unwrap().parse::<u32>() {
+        Ok(income) => {
+            let mut portfolio = Portfolio::get(msg.chat.id.0).unwrap_or(Portfolio::empty());
+
+            portfolio.get_account_mut(&*balance_name).unwrap().add_balance_income(income);
+            portfolio.save(msg.chat.id.0)?;
+            bot.send_message(msg.chat.id, format!("portfolio updated {:#?}", portfolio)).await?;
+            start_again(bot, dialogue, msg.chat.id).await?;
+        }
+        Err(_) => { todo!() }
+    }
+    Ok(())
+}
+
+async fn listen_balance_outcome_amount(
+    bot: Bot,
+    dialogue: MyDialogue,
+    balance_name: String,
+    msg: Message,
+) -> HandlerResult {
+    match msg.text().unwrap().parse::<u32>() {
+        Ok(outcome) => {
+            dialogue.update(State::ListenCategoryCallback { balance_name, outcome }).await?;
+            bot.send_message(msg.chat.id, "Выберите категорию трат:").reply_markup(make_keyboard(3, Category::VALUES.to_vec())).await?;
         }
         Err(_) => { todo!() }
     }

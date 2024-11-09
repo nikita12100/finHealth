@@ -1,5 +1,5 @@
 use rusqlite::{named_params, Connection};
-use crate::db::dao::Portfolio;
+use crate::db::portfolio::Portfolio;
 
 type HandlerResult<T> = rusqlite::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 

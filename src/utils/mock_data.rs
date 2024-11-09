@@ -1,4 +1,5 @@
-use crate::db::dao::{Account, Portfolio};
+use crate::db::account::Account;
+use crate::db::portfolio::Portfolio;
 use crate::utils::currency::Currency;
 
 pub struct MockData {}
@@ -15,12 +16,12 @@ impl MockData {
         p.add_account(a3);
         p.add_account(a4);
 
-        p.add_account_record("repo", 550);
-        p.add_account_record("repo", 600);
-        p.add_account_record("daily", 25);
-        p.add_account_record("daily", 15);
-        p.add_account_record("daily", 5);
-        p.add_account_record("daily", 0);
+        p.get_account_mut("repo").unwrap().set_balance_amount(550);
+        p.get_account_mut("repo").unwrap().set_balance_amount(600);
+        p.get_account_mut("daily").unwrap().set_balance_amount(25);
+        p.get_account_mut("daily").unwrap().set_balance_amount(15);
+        p.get_account_mut("daily").unwrap().set_balance_amount(5);
+        p.get_account_mut("daily").unwrap().set_balance_amount(0);
 
         p
     }
