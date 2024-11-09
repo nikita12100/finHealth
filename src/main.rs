@@ -13,12 +13,12 @@ use teloxide::{
 };
 use rusqlite::Result;
 use teloxide::types::{InlineKeyboardButton, InlineKeyboardMarkup};
-use crate::buttons::edit_portfolio_buttons::handler_update_portfolio_btn;
-use crate::buttons::get_portfolio_buttons::handler_get_portfolio_btn;
-use crate::buttons::set_category_buttons::{handler_category_btn, Category};
-use crate::buttons::start_buttons::{handler_start_btn, StartButton};
-use crate::buttons::update_account_buttons::handler_update_account_btn;
-use crate::buttons::update_portfolio_buttons::handler_update_balance_btn;
+use crate::buttons::edit_portfolio::handler_update_portfolio_btn;
+use crate::buttons::get_portfolio::handler_get_portfolio_btn;
+use crate::buttons::set_category::{handler_category_btn, Category};
+use crate::buttons::start::{handler_start_btn, StartButton};
+use crate::buttons::update_account::handler_update_account_btn;
+use crate::buttons::update_portfolio::handler_update_balance_btn;
 use crate::db::account::Account;
 use crate::db::db::DataBase;
 use crate::db::portfolio::Portfolio;

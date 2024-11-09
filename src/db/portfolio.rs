@@ -37,6 +37,23 @@ impl Portfolio {
                 PiePiece { size, label: account.get_name().clone() }
             }).collect();
 
-        PieChart::create(parts)
+        let total_summ: u32 = self.accounts.iter()
+            .filter(|account| account.get_last_amount().is_some())
+            .filter(|account| account.get_last_amount().unwrap() > 0)
+            .map(|account| account.get_last_amount().unwrap())
+            .sum();
+
+        let mut total_sum_str: Vec<char> = Vec::new();
+        for (i, char) in total_summ.to_string().chars().rev().enumerate() {
+            if i % 3 == 0 {
+                total_sum_str.push(' ');
+                total_sum_str.push(char);
+            } else {
+                total_sum_str.push(char);
+            }
+        }
+        total_sum_str.reverse();
+
+        PieChart::create(parts, "Срез по всем балансам", Some(total_sum_str.iter().collect()))
     }
 }

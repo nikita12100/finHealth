@@ -32,9 +32,9 @@ impl Account {
         let new_amount = self.balance.last_mut().unwrap().amount + income;
         self.set_balance_amount(new_amount);
     }
-    pub fn add_balance_outcome(&mut self, outcome: u32, category: &str) {
+    pub fn add_balance_outcome(&mut self, outcome: u32, category: String) {
         let new_amount = self.balance.last_mut().unwrap().amount - outcome;
-        self.set_balance_amount_with_category(new_amount, category.to_string());
+        self.set_balance_amount_with_category(new_amount, category);
     }
     pub fn get_name(&self) -> String { self.name.clone() }
     pub fn get_name_str(&self) -> &str { &self.name }
