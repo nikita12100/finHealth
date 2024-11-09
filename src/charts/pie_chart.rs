@@ -22,7 +22,6 @@ impl PieChart {
     const BASE_COLOR: RGBColor = RGBColor(99, 153, 61);
     const LABELS_STYLE: (&'static str, i32, &'static RGBColor) = ("monospace", 25, &BLACK);
     const PERCENTAGE_STYLE: (&'static str, i32, &'static RGBColor) = ("monospace", 40, &WHITE);
-    const CENTER_TEXT_STYLE: (&'static str, i32, &'static RGBColor) = ("monospace", 40, &BLACK);
 
 
     pub fn create(parts: Vec<PiePiece>, title_text: &str, center_text: Option<String>) -> InputFile {
@@ -43,7 +42,7 @@ impl PieChart {
             let root = BitMapBackend::<RGBPixel>::with_buffer_and_format(bytes.as_mut_slice(), (Self::WIDTH, Self::HEIGHT)).unwrap().into_drawing_area();
             root.fill(&Self::BACKGROUND_COLOR).unwrap();
 
-            let title_style = TextStyle::from(("serif", 50).into_font()).color(&(BLACK));
+            let title_style = TextStyle::from(("monospace", 50, "italic").into_font()).color(&(BLACK));
             root.titled(title_text, title_style).unwrap();
 
             let pie_colors = Self::generate_colors(sizes.len() as u8);
@@ -51,16 +50,19 @@ impl PieChart {
             let center = (dims.0 as i32 / 2, dims.1 as i32 / 2);
             let mut pie = Pie::new(&center, &Self::RADIUS, &sizes, &pie_colors, &labels);
 
+            if let Some(text) = center_text {
+                let center_text_style = TextStyle::from(("monospace", 40, "bold").into_font()).color(&(BLACK));
+                let text_pos = (center.0 - ((text.len() * 9) as i32), center.1 - 10);
+                root.draw_text(&text, &center_text_style.into_text_style(&root), text_pos).unwrap();
+                pie.donut_hole(Self::HOLE_RADIUS);
+            } else {
+                pie.donut_hole(Self::HOLE_RADIUS / 2.0);
+            }
+
             pie.start_angle(-180.0);  // отображать по часовой начиная с 9.00
             pie.label_style(Self::LABELS_STYLE.into_text_style(&root));
             pie.percentages(Self::PERCENTAGE_STYLE.into_text_style(&root));
-            pie.donut_hole(Self::HOLE_RADIUS);
             root.draw(&pie).unwrap();
-
-            if let Some(text) = center_text {
-                let text_pos = (center.0 - ((text.len() * 9) as i32), center.1 - 10);
-                root.draw_text(&text, &Self::CENTER_TEXT_STYLE.into_text_style(&root), text_pos).unwrap();
-            }
 
             root.present().unwrap();
         }
