@@ -15,6 +15,7 @@ use rusqlite::Result;
 use teloxide::types::{InlineKeyboardButton, InlineKeyboardMarkup};
 use crate::buttons::get_portfolio_buttons::handler_get_portfolio_btn;
 use crate::buttons::start_buttons::{handler_start_btn, StartButton};
+use crate::buttons::update_account_buttons::handler_update_account_btn;
 use crate::buttons::update_portfolio_buttons::{handler_update_balance_btn, handler_update_portfolio_btn};
 use crate::db::dao::{Account, Portfolio};
 use crate::db::db::DataBase;
@@ -36,7 +37,7 @@ pub enum State {
     ListenBalanceName,
     ListenNewBalanceName,
     /// Get client data from chat for each listen
-    GotListenBalanceName(String),
+    GotListenBalanceNameListenAccountButtons(String),
     GotNewBalanceName(String),
 }
 
@@ -51,6 +52,7 @@ pub enum Command {
 
 #[tokio::main]
 async fn main() {
+    std::env::set_var("RUST_LOG", "info");
     pretty_env_logger::init();
     log::info!("Starting portfolio manager bot...");
 
@@ -65,9 +67,8 @@ async fn main() {
             Update::filter_message()
                 .enter_dialogue::<Message, ErasedStorage<State>, State>()
                 .branch(dptree::case![State::Start].filter_command::<Command>().endpoint(start))
-                .branch(dptree::case![State::GotListenBalanceName(String)].endpoint(listen_balance_new_amount))
                 .branch(dptree::case![State::ListenNewBalanceName].endpoint(listen_new_balance_name))
-                .branch(dptree::case![State::GotNewBalanceName(String)].endpoint(listen_new_balance_amount))
+                .branch(dptree::case![State::GotNewBalanceName(new_balance_name)].endpoint(listen_new_balance_amount))
                 .branch(dptree::endpoint(invalid_command))
         )
         .branch(
@@ -75,8 +76,10 @@ async fn main() {
                 .enter_dialogue::<CallbackQuery, ErasedStorage<State>, State>()
                 .branch(dptree::case![State::ListenStartButtons].endpoint(handler_start_btn))
                 .branch(dptree::case![State::ListenGetPortfolioButtons].endpoint(handler_get_portfolio_btn))
-                .branch(dptree::case![State::ListenUpdatePortfolioButtons].endpoint(handler_update_portfolio_btn))
+                // .branch(dptree::case![State::ListenUpdatePortfolioButtons].endpoint(handler_update_portfolio_btn))
                 .branch(dptree::case![State::ListenBalanceName].endpoint(handler_update_balance_btn))
+                .branch(dptree::case![State::GotListenBalanceNameListenAccountButtons(balance_name)].endpoint(handler_update_account_btn))
+
                 .endpoint(handler_print),
         );
 

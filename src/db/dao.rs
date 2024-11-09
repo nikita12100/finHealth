@@ -1,5 +1,7 @@
 use chrono::{DateTime, Utc};
 use chrono::serde::ts_seconds;
+use teloxide::types::InputFile;
+use crate::charts::pie_chart::{PieChart, PiePiece};
 use crate::utils::currency::Currency;
 
 #[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
@@ -53,5 +55,17 @@ impl Portfolio {
                 account.add_balance_record(_amount);
             }
         }
+    }
+
+    pub fn draw_pie_current_allocations(&self) -> InputFile {
+        let parts = self.accounts.iter()
+            .filter(|account| account.balance.last().is_some())
+            .filter(|account| account.balance.last().unwrap().amount > 0)
+            .map(|account| {
+            let size = account.balance.last().unwrap().amount as f64;
+            PiePiece { size, label: account.name.clone() }
+        }).collect();
+
+        PieChart::create(parts)
     }
 }

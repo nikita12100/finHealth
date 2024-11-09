@@ -5,6 +5,7 @@ use teloxide::prelude::{CallbackQuery, Requester};
 use crate::{make_keyboard, start_again, HandlerResult, MyDialogue, State};
 use crate::buttons::get_portfolio_buttons::GetPortfolioButtons;
 use crate::buttons::update_portfolio_buttons::UpdatePortfolioButton;
+use crate::db::dao::Portfolio;
 use crate::db::db::DataBase;
 use crate::utils::mock_data::MockData;
 
@@ -30,10 +31,16 @@ pub async fn handler_start_btn(bot: Bot, dialogue: MyDialogue, q: CallbackQuery)
             bot.send_message(chat_id, "Chose").reply_markup(make_keyboard(1, GetPortfolioButtons::VALUES.to_vec())).await?;
         }
         StartButton::UPDATE_PORTFOLIO => {
-            bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to UPDATE_PORTFOLIO").await?;
+            bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "Вы хотите обновить портфель...").await?;
+            // dialogue.update(State::ListenUpdatePortfolioButtons).await?;
 
-            dialogue.update(State::ListenUpdatePortfolioButtons).await?;
-            bot.send_message(chat_id, "Chose").reply_markup(make_keyboard(1, UpdatePortfolioButton::VALUES.to_vec())).await?;
+            let portfolio = Portfolio::get(q.chat_id().unwrap().0)?.get_account_names();
+            let mut balances: Vec<&str> = portfolio.iter().map(|x| x as &str).collect();
+            balances.extend(UpdatePortfolioButton::VALUES);
+
+            bot.send_message(chat_id, "Выбере какой баланс вы хотите изменить?").reply_markup(make_keyboard(1, balances)).await?;
+
+            dialogue.update(State::ListenBalanceName).await?;
         }
         StartButton::HELP => {
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to HELP").await?;
