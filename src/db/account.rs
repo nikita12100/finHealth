@@ -38,5 +38,6 @@ impl Account {
     }
     pub fn get_name(&self) -> String { self.name.clone() }
     pub fn get_name_str(&self) -> &str { &self.name }
+    pub fn get_currency(&self) -> Currency { self.currency.clone() }
     pub fn get_last_amount(&self) -> Option<u32> { self.balance.last().map(|x| x.amount) }
 }
