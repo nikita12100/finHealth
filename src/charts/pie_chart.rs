@@ -14,7 +14,7 @@ pub struct PiePiece {
 
 pub struct PieChart {}
 impl PieChart {
-    const WIDTH: u32 = 1000;
+    const WIDTH: u32 = 1200;
     const HEIGHT: u32 = 1000;
     const RADIUS: f64 = 400.0;
     const HOLE_RADIUS: f64 = 150.0;

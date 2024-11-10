@@ -2,6 +2,7 @@ mod buttons;
 mod charts;
 mod db;
 mod utils;
+mod enums;
 
 use teloxide::{
     dispatching::dialogue::{
@@ -22,7 +23,9 @@ use crate::buttons::update_portfolio::handler_update_balance_btn;
 use crate::db::account::Account;
 use crate::db::db::DataBase;
 use crate::db::portfolio::Portfolio;
-use crate::utils::currency::Currency;
+use crate::enums::asset_location::AssetLocation;
+use crate::enums::asset_type::AssetType;
+use crate::enums::currency::Currency;
 
 type MyDialogue = Dialogue<State, ErasedStorage<State>>;
 type MyStorage = std::sync::Arc<ErasedStorage<State>>;
@@ -176,7 +179,7 @@ async fn listen_new_balance_amount(
 ) -> HandlerResult {
     match msg.text().unwrap().parse::<u32>() {
         Ok(amount) => {
-            let balance = Account::new(balance_name, amount, Currency::RUB);
+            let balance = Account::new(balance_name, amount, Currency::RUB, AssetLocation::Other, AssetType::default());
             let mut portfolio = Portfolio::get(msg.chat.id.0).unwrap_or(Portfolio::empty());
 
             portfolio.add_account(balance);
@@ -200,7 +203,7 @@ async fn listen_balance_new_amount(
         Ok(new_balance) => {
             let mut portfolio = Portfolio::get(msg.chat.id.0).unwrap_or(Portfolio::empty());
 
-            portfolio.get_account_mut(&*balance_name).unwrap().set_balance_amount(new_balance);
+            portfolio.get_account_mut(&*balance_name).unwrap().set_balance_amount(new_balance, None);
             portfolio.save(msg.chat.id.0)?;
             bot.send_message(msg.chat.id, format!("portfolio updated {:#?}", portfolio)).await?;
             start_again(bot, dialogue, msg.chat.id).await?;
