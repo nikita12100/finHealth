@@ -1,7 +1,11 @@
 use std::collections::HashMap;
+use std::ops::Sub;
+use chrono::{Days, Utc};
 use teloxide::types::InputFile;
+use itertools::Itertools;
 use crate::charts::pie_chart::{PieChart, PiePiece};
 use crate::db::account::Account;
+use crate::db::balance_timed::BalanceTimed;
 use crate::enums::currency::Currency;
 use crate::utils::exchange_rate::ExchangeRate;
 
@@ -46,6 +50,25 @@ impl Portfolio {
         }
 
         PieChart::create(parts, title, Some(Self::total_sum_spaced(total_summ)))
+    }
+
+    pub fn draw_pie_week_spends(&self, account_name: String) -> InputFile {
+        let num_days = 7;
+        let week_threshold = Utc::now().checked_sub_days(Days::new(7)).unwrap();
+        let account = self.accounts.iter().find(|account| account.get_name() == account_name).unwrap();
+
+        let mut distribution_spends: HashMap<String, u32> = HashMap::new();
+        for (balance_prev, balance) in account.get_balances().into_iter().tuple_windows() {
+            let spend = balance_prev.get_amount() - balance.get_amount();
+            if spend > 0 && balance.get_date() > week_threshold {
+                distribution_spends
+                    .entry(balance.get_category().unwrap_or("unknown".to_string()))
+                    .and_modify(|sum| *sum += spend)
+                    .or_insert(spend);
+            }
+        }
+
+        Self::draw_pie_from_distribution(distribution_spends, &format!("Траты за {} дней", num_days))
     }
 
     pub fn draw_pie_type_allocations(&self) -> InputFile {

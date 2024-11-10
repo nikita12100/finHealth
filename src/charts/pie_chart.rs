@@ -25,6 +25,7 @@ impl PieChart {
 
 
     pub fn create(parts: Vec<PiePiece>, title_text: &str, center_text: Option<String>) -> InputFile {
+        assert!(parts.len() > 0);
         let sizes = parts.iter().map(|x| x.size).collect::<Vec<f64>>();
         let labels = parts.iter().map(|x| x.label.clone()).collect::<Vec<String>>();
         assert_eq!(sizes.len(), labels.len());
