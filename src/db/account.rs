@@ -36,6 +36,10 @@ impl Account {
         let new_amount = self.balance.last().unwrap().get_amount() + income;
         self.set_balance_amount(new_amount, None);
     }
+    pub fn add_balance_income_date(&mut self, income: u32, date: DateTime<Utc>) {
+        let new_amount = self.balance.last().unwrap().get_amount() + income;
+        self.set_balance_amount_date(new_amount, None, date);
+    }
     pub fn add_balance_outcome(&mut self, outcome: u32, category: String) {
         let new_amount = self.balance.last().unwrap().get_amount() - outcome;
         self.set_balance_amount(new_amount, Some(category));

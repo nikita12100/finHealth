@@ -1,11 +1,10 @@
 use std::collections::HashMap;
-use std::ops::Sub;
-use chrono::{Days, Utc};
+use chrono::{Date, Days, TimeZone, Utc};
 use teloxide::types::InputFile;
 use itertools::Itertools;
+use crate::charts::line_series::{Line, LineChart, Series};
 use crate::charts::pie_chart::{PieChart, PiePiece};
 use crate::db::account::Account;
-use crate::db::balance_timed::BalanceTimed;
 use crate::enums::currency::Currency;
 use crate::utils::exchange_rate::ExchangeRate;
 
@@ -52,19 +51,18 @@ impl Portfolio {
         PieChart::create(parts, title, Some(Self::total_sum_spaced(total_summ)))
     }
 
-    pub fn draw_pie_week_spends(&self, account_name: String) -> InputFile {
-        let num_days = 7;
-        let week_threshold = Utc::now().checked_sub_days(Days::new(7)).unwrap();
+    pub fn draw_pie_spends(&self, account_name: String, num_days: u64) -> InputFile {
+        let week_threshold = Utc::now().checked_sub_days(Days::new(num_days)).unwrap();
         let account = self.accounts.iter().find(|account| account.get_name() == account_name).unwrap();
 
         let mut distribution_spends: HashMap<String, u32> = HashMap::new();
         for (balance_prev, balance) in account.get_balances().into_iter().tuple_windows() {
-            let spend = balance_prev.get_amount() - balance.get_amount();
+            let spend = balance_prev.get_amount() as i32 - balance.get_amount() as i32;
             if spend > 0 && balance.get_date() > week_threshold {
                 distribution_spends
                     .entry(balance.get_category().unwrap_or("unknown".to_string()))
-                    .and_modify(|sum| *sum += spend)
-                    .or_insert(spend);
+                    .and_modify(|sum| *sum += spend as u32)
+                    .or_insert(spend as u32);
             }
         }
 
@@ -119,6 +117,19 @@ impl Portfolio {
         Self::draw_pie_from_distribution(distribution_amount, "Срез по всем балансам")
     }
 
+    pub fn draw_line_test(&self) -> InputFile {
+        let line = Line {
+            label: "some_line".to_string(),
+            series: vec![
+                Series::new(Utc.with_ymd_and_hms(2019, 10, 1, 0, 0, 0).unwrap(), 132),
+                Series::new(Utc.with_ymd_and_hms(2019, 10, 2, 0, 0, 0).unwrap(), 136),
+                Series::new(Utc.with_ymd_and_hms(2019, 10, 4, 0, 0, 0).unwrap(), 132),
+                Series::new(Utc.with_ymd_and_hms(2019, 10, 18, 0, 0, 0).unwrap(), 140),
+            ],
+        };
+
+        LineChart::create("test", line)
+    }
 
     fn total_sum_spaced(total_summ: u32) -> String {
         let mut total_sum_str: Vec<char> = Vec::new();

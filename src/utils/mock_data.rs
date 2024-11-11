@@ -12,17 +12,19 @@ impl MockData {
     pub fn create() -> Portfolio {
         let mut p = Portfolio::empty();
         let a1 = Account::new("$ кеш".parse().unwrap(), 6500, Currency::USD, AssetLocation::PocketMoney, AssetType::Cash);
-        let a2 = Account::new("крипта".parse().unwrap(), 250000, Currency::RUB, AssetLocation::Broker2, AssetType::Crypto);
-        let a3 = Account::new("TMON".parse().unwrap(), 871995, Currency::RUB, AssetLocation::Broker1, AssetType::Repo);
-        let a4 = Account::new("металл".parse().unwrap(), 66806, Currency::RUB, AssetLocation::Broker2, AssetType::Gold);
+        let a2 = Account::new("крипта".parse().unwrap(), 200000, Currency::RUB, AssetLocation::Broker2, AssetType::Crypto);
+        let a33 = Account::new("TMON".parse().unwrap(), 100000, Currency::RUB, AssetLocation::Broker1, AssetType::Repo);
+        let a3 = Account::new("TPAY".parse().unwrap(), 403000, Currency::RUB, AssetLocation::Broker1, AssetType::Bond);
+        let a4 = Account::new("металл".parse().unwrap(), 115779, Currency::RUB, AssetLocation::Broker2, AssetType::Gold);
         let a5 = Account::new("вклад".parse().unwrap(), 55000, Currency::RUB, AssetLocation::Bank1, AssetType::Deposit);
-        let a6 = Account::new("акции".parse().unwrap(), 326687, Currency::RUB, AssetLocation::PocketMoney, AssetType::Share);
-        let a7 = Account::new("обилиги руб".parse().unwrap(), 216554, Currency::RUB, AssetLocation::Broker2, AssetType::Bond);
-        let a8 = Account::new("обилиги $".parse().unwrap(), 1585, Currency::USD, AssetLocation::Broker2, AssetType::BondCurrency);
+        let a6 = Account::new("акции".parse().unwrap(), 474512, Currency::RUB, AssetLocation::PocketMoney, AssetType::Share);
+        let a7 = Account::new("обилиги руб".parse().unwrap(), 307555, Currency::RUB, AssetLocation::Broker2, AssetType::Bond);
+        let a8 = Account::new("обилиги $".parse().unwrap(), 2389, Currency::USD, AssetLocation::Broker2, AssetType::BondCurrency);
         let a9 = Account::new("daily".parse().unwrap(), 100000, Currency::RUB, AssetLocation::Bank1, AssetType::Cash);
         p.add_account(a1);
         p.add_account(a2);
         p.add_account(a3);
+        p.add_account(a33);
         p.add_account(a4);
         p.add_account(a5);
         p.add_account(a6);
@@ -37,6 +39,9 @@ impl MockData {
         p.get_account_mut("daily").unwrap().add_balance_outcome_date(5000, Category::APARTMENT_RENT.to_string(), Utc.with_ymd_and_hms(2024, 11, 6, 21, 1, 55).unwrap());
         p.get_account_mut("daily").unwrap().add_balance_outcome_date(4000, Category::CAFES_AND_RESTAURANTS.to_string(), Utc.with_ymd_and_hms(2024, 11, 8, 21, 19, 55).unwrap());
         p.get_account_mut("daily").unwrap().add_balance_outcome_date(20000, Category::PETS.to_string(), Utc.with_ymd_and_hms(2024, 11, 10, 22, 1, 55).unwrap());
+        p.get_account_mut("daily").unwrap().add_balance_income_date(40000, Utc.with_ymd_and_hms(2024, 11, 11, 12, 1, 55).unwrap());
+        p.get_account_mut("daily").unwrap().add_balance_outcome_date(5000, Category::APARTMENT_RENT.to_string(), Utc.with_ymd_and_hms(2024, 11, 11, 15, 1, 55).unwrap());
+        p.get_account_mut("daily").unwrap().add_balance_outcome_date(30000, Category::PRODUCTS.to_string(), Utc.with_ymd_and_hms(2024, 11, 11, 20, 1, 55).unwrap());
 
         p
     }

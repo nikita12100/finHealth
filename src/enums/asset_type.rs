@@ -17,6 +17,6 @@ pub enum AssetType {
     Share,
     #[strum(serialize = "bond", to_string = "bond")]
     Bond,
-    #[strum(serialize = "$bond", to_string = "$bond")]
+    #[strum(serialize = "bond$", to_string = "bond$")]
     BondCurrency,
 }
