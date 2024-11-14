@@ -70,7 +70,7 @@ impl PieChart {
         bytes
     }
 
-    fn generate_colors(size: u8) -> Vec<RGBColor> {
+    pub fn generate_colors(size: u8) -> Vec<RGBColor> {
         let mut colors: Vec<RGBColor> = Vec::new();
         colors.push(Self::BASE_COLOR);
 

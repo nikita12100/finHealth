@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use chrono::{Date, Days, TimeZone, Utc};
+use chrono::{Days, Utc};
 use teloxide::types::InputFile;
 use itertools::Itertools;
 use crate::charts::line_series::{Line, LineChart, Series};
@@ -118,17 +118,15 @@ impl Portfolio {
     }
 
     pub fn draw_line_test(&self) -> InputFile {
-        let line = Line {
-            label: "some_line".to_string(),
-            series: vec![
-                Series::new(Utc.with_ymd_and_hms(2019, 10, 1, 0, 0, 0).unwrap(), 132),
-                Series::new(Utc.with_ymd_and_hms(2019, 10, 2, 0, 0, 0).unwrap(), 136),
-                Series::new(Utc.with_ymd_and_hms(2019, 10, 4, 0, 0, 0).unwrap(), 132),
-                Series::new(Utc.with_ymd_and_hms(2019, 10, 18, 0, 0, 0).unwrap(), 140),
-            ],
-        };
+        let data = self.accounts.iter().map(|account| {
+            let series = account.get_balances().iter().map(|balance| {
+                Series::new(balance.get_date(), balance.get_amount())
+            }).collect::<Vec<_>>();
+            Line::new(account.get_name(), series)
+        }).collect::<Vec<Line>>();
 
-        LineChart::create("test", line)
+
+        LineChart::create("История по всем счетам", data)
     }
 
     fn total_sum_spaced(total_summ: u32) -> String {

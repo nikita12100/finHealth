@@ -14,7 +14,7 @@ impl GetPortfolioButtons {
     pub const DRAW_TYPE_ALLOCATIONS: &'static str = "Срез по типу актива";
     pub const DRAW_WEEK_SPENDS: &'static str = "Срез дейли трат за неделю";
     pub const DRAW_MONTH_SPENDS: &'static str = "Срез дейли трат за месяц";
-    pub const DRAW_LINE_TEST: &'static str = "Линия тест";
+    pub const DRAW_LINE_ALL_HIST: &'static str = "Историчность по всем счетам";
     // pub const DRAW_CURRENT_ALLOCATIONS: &'static str = "Показать траты за все время по балансу";
     pub const RAW_BALANCE: &'static str = "[DEV] Показать сырой баланс";
 
@@ -25,7 +25,7 @@ impl GetPortfolioButtons {
         Self::DRAW_TYPE_ALLOCATIONS,
         Self::DRAW_WEEK_SPENDS,
         Self::DRAW_MONTH_SPENDS,
-        Self::DRAW_LINE_TEST,
+        Self::DRAW_LINE_ALL_HIST,
         Self::RAW_BALANCE
     ];
 }
@@ -83,7 +83,7 @@ pub async fn handler_get_portfolio_btn(bot: Bot, dialogue: MyDialogue, q: Callba
 
             start_again(bot, dialogue, chat_id).await?;
         }
-        GetPortfolioButtons::DRAW_LINE_TEST => {
+        GetPortfolioButtons::DRAW_LINE_ALL_HIST => {
             let portfolio = Portfolio::get(q.chat_id().unwrap().0)?;
             let line_chart = portfolio.draw_line_test();
 

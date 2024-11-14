@@ -16,6 +16,16 @@ pub struct Account {
 }
 
 impl Account {
+
+    pub fn new_date(name: String, start_balance: u32, currency: Currency, asset_location: AssetLocation, asset_type: AssetType, date: DateTime<Utc>) -> Self {
+        Account {
+            name,
+            currency,
+            asset_location,
+            asset_type,
+            balance: vec![BalanceTimed::new_date(start_balance, date)],
+        }
+    }
     pub fn new(name: String, start_balance: u32, currency: Currency, asset_location: AssetLocation, asset_type: AssetType) -> Self {
         Account {
             name,
