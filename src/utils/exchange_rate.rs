@@ -26,25 +26,25 @@ impl ExchangeRate {
     pub fn convert(&self, amount: f32, from: &Currency, to: &Currency) -> f32 {
         if from.eq(to) { amount } else {
             match from {
-                Currency::RUB => {
+                Currency::Rub => {
                     match to {
-                        Currency::RUB => amount,
-                        Currency::USD => amount * self.rub_usd,
-                        Currency::EUR => amount * self.rub_eur,
+                        Currency::Rub => amount,
+                        Currency::Usd => amount * self.rub_usd,
+                        Currency::Eur => amount * self.rub_eur,
                     }
                 }
-                Currency::USD => {
+                Currency::Usd => {
                     match to {
-                        Currency::RUB => amount * self.usd_rub,
-                        Currency::USD => amount,
-                        Currency::EUR => amount * self.usd_eur,
+                        Currency::Rub => amount * self.usd_rub,
+                        Currency::Usd => amount,
+                        Currency::Eur => amount * self.usd_eur,
                     }
                 }
-                Currency::EUR => {
+                Currency::Eur => {
                     match to {
-                        Currency::RUB => amount * self.eur_usd,
-                        Currency::USD => amount * self.eur_usd,
-                        Currency::EUR => amount,
+                        Currency::Rub => amount * self.eur_usd,
+                        Currency::Usd => amount * self.eur_usd,
+                        Currency::Eur => amount,
                     }
                 }
             }

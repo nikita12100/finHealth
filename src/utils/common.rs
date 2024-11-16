@@ -32,6 +32,11 @@ pub fn generate_colors(size: u8, base_color: RGBColor) -> Vec<RGBColor> {
     colors
 }
 
+
+pub fn make_keyboard_string(row_size: usize, buttons: Vec<String>) -> InlineKeyboardMarkup {
+    let strings = buttons.iter().map(|s| s.as_str()).collect();
+    make_keyboard(row_size, strings)
+}
 pub fn make_keyboard(row_size: usize, buttons: Vec<&str>) -> InlineKeyboardMarkup {
     let mut keyboard: Vec<Vec<InlineKeyboardButton>> = vec![];
 

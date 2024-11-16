@@ -3,8 +3,8 @@ use teloxide::dispatching::dialogue::GetChatId;
 use teloxide::payloads::SendMessageSetters;
 use teloxide::prelude::{CallbackQuery, Requester};
 use crate::{HandlerResult, MyDialogue, State};
-use crate::buttons::set_base_currency::ButtonBaseCurrency;
-use crate::utils::common::make_keyboard;
+use crate::buttons::set_currency::ButtonCurrency;
+use crate::utils::common::make_keyboard_string;
 
 pub struct EditPortfolioButton;
 
@@ -45,11 +45,9 @@ pub async fn handler_update_portfolio_btn(bot: Bot, dialogue: MyDialogue, q: Cal
         }
         EditPortfolioButton::SET_BASE_CURRENCY => {
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to SET_BASE_CURRENCY").await?;
-            let buttons: Vec<String> = ButtonBaseCurrency::get_currencies();
-            let buttons_str: Vec<&str> = buttons.iter().map(|s| s.as_str()).collect();
 
             dialogue.update(State::ListenSetBaseCurrencyButtonsCallback).await?;
-            bot.send_message(chat_id, "Chose").reply_markup(make_keyboard(1, buttons_str)).await?;
+            bot.send_message(chat_id, "Chose").reply_markup(make_keyboard_string(1, ButtonCurrency::get_currencies())).await?;
         }
         EditPortfolioButton::SET_EXCHANGE_RATE => {
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to SET_EXCHANGE_RATE").await?;

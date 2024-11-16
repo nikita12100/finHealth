@@ -1,19 +1,24 @@
 use teloxide::Bot;
 use teloxide::dispatching::dialogue::GetChatId;
+use teloxide::payloads::SendMessageSetters;
 use teloxide::prelude::{CallbackQuery, Requester};
 use crate::{HandlerResult, MyDialogue, State};
+use crate::buttons::account::set_location::ButtonLocation;
+use crate::buttons::account::set_type::ButtonType;
+use crate::buttons::set_currency::ButtonCurrency;
 use crate::db::portfolio::Portfolio;
 use crate::db::db::DataBase;
+use crate::utils::common::make_keyboard_string;
 
-pub struct UpdateAccountButton;
+pub struct EditAccountButton;
 
-impl UpdateAccountButton {
+impl EditAccountButton {
     pub const SET_BALANCE: &'static str = "✍️ Установить баланс";
     pub const INCOME_AMOUNT: &'static str = "📈 Внести доход";
     pub const OUTCOME_AMOUNT: &'static str = "📉 Внести расход";
-    pub const SET_CURRENCY: &'static str = "Установить валюту счета";
-    pub const SET_LOCATION: &'static str = "Установить ??локацию??";
-    pub const SET_TYPE: &'static str = "Установить тип счета";
+    pub const SET_CURRENCY: &'static str = "Изменить валюту счета";
+    pub const SET_LOCATION: &'static str = "Изменить ??локацию??";
+    pub const SET_TYPE: &'static str = "Изменить тип счета";
 
     pub const VALUES: &'static [&'static str; 6] = &[
         Self::SET_BALANCE,
@@ -32,30 +37,39 @@ pub async fn handler_update_account_btn(bot: Bot, dialogue: MyDialogue, balance_
     let portfolio = Portfolio::get(q.chat_id().unwrap().0)?;
 
     match q.data.clone().unwrap().as_str() {
-        UpdateAccountButton::SET_BALANCE => {
+        EditAccountButton::SET_BALANCE => {
             let current_balance = portfolio.get_account(&*balance_name).unwrap().get_last_amount().unwrap();
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), format!("Текущее значение {}, укажите новое значение баланса:", current_balance)).await?;
 
             dialogue.update(State::ListenBalanceAmountFor(balance_name)).await?;
         }
-        UpdateAccountButton::INCOME_AMOUNT => {
+        EditAccountButton::INCOME_AMOUNT => {
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "введите доход:").await?;
 
             dialogue.update(State::ListenBalanceIncomeFor(balance_name)).await?;
         }
-        UpdateAccountButton::OUTCOME_AMOUNT => {
+        EditAccountButton::OUTCOME_AMOUNT => {
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "введите расход:").await?;
 
             dialogue.update(State::ListenBalanceOutcomeFor(balance_name)).await?;
         }
-        UpdateAccountButton::SET_CURRENCY => {
-            todo!()
+        EditAccountButton::SET_CURRENCY => {
+            bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to SET_CURRENCY").await?;
+
+            dialogue.update(State::ListenCurrencyFor(balance_name)).await?;
+            bot.send_message(chat_id, "Chose").reply_markup(make_keyboard_string(1, ButtonCurrency::get_currencies())).await?;
         }
-        UpdateAccountButton::SET_LOCATION => {
-            todo!()
+        EditAccountButton::SET_LOCATION => {
+            bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to SET_LOCATION").await?;
+
+            dialogue.update(State::ListenLocationFor(balance_name)).await?;
+            bot.send_message(chat_id, "Chose").reply_markup(make_keyboard_string(1, ButtonLocation::get_locations())).await?;
         }
-        UpdateAccountButton::SET_TYPE => {
-            todo!()
+        EditAccountButton::SET_TYPE => {
+            bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to SET_TYPE").await?;
+
+            dialogue.update(State::ListenTypeFor(balance_name)).await?;
+            bot.send_message(chat_id, "Chose").reply_markup(make_keyboard_string(1, ButtonType::get_types())).await?;
         }
         _ => { todo!() }
     }

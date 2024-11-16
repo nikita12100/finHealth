@@ -1,4 +1,7 @@
+use std::slice::Iter;
+use std::str::FromStr;
 use strum_macros::Display;
+use crate::enums::asset_location::AssetLocation::*;
 
 #[derive(Clone, Debug, Display, Default, serde::Serialize, serde::Deserialize, PartialEq)]
 pub enum AssetLocation {
@@ -19,4 +22,37 @@ pub enum AssetLocation {
     Bank3,
     #[strum(serialize = "PocketMoney", to_string = "PocketMoney")]
     PocketMoney,
+}
+
+impl AssetLocation {
+    pub fn iterator() -> Iter<'static, AssetLocation> {
+        static VALUES: [AssetLocation; 8] = [
+            Other,
+            Broker1,
+            Broker2,
+            Broker3,
+            Bank1,
+            Bank2,
+            Bank3,
+            PocketMoney,
+        ];
+        VALUES.iter()
+    }
+}
+
+impl FromStr for AssetLocation {
+    type Err = ();
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Other" => Ok(Other),
+            "Broker1" => Ok(Broker1),
+            "Broker2" => Ok(Broker2),
+            "Broker3" => Ok(Broker3),
+            "Bank1" => Ok(Bank1),
+            "Bank2" => Ok(Bank2),
+            "Bank3" => Ok(Bank3),
+            "PocketMoney" => Ok(PocketMoney),
+            _ => Err(()),
+        }
+    }
 }

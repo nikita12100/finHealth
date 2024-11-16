@@ -7,17 +7,17 @@ use crate::enums::currency::Currency::*;
 pub enum Currency {
     #[default]
     #[strum(serialize = "RUB", to_string = "RUB")]
-    RUB,
+    Rub,
     #[strum(serialize = "USD", to_string = "USD")]
-    USD,
+    Usd,
     #[strum(serialize = "EUR", to_string = "EUR")]
-    EUR,
+    Eur,
 }
 
 impl Currency {
     pub fn iterator() -> Iter<'static, Currency> {
-        static CURRENCY: [Currency; 3] = [RUB, USD, EUR];
-        CURRENCY.iter()
+        static VALUES: [Currency; 3] = [Rub, Usd, Eur];
+        VALUES.iter()
     }
 }
 
@@ -25,9 +25,9 @@ impl FromStr for Currency {
     type Err = ();
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_lowercase().as_str() {
-            "rub" => Ok(RUB),
-            "usd" => Ok(USD),
-            "eur" => Ok(EUR),
+            "rub" => Ok(Rub),
+            "usd" => Ok(Usd),
+            "eur" => Ok(Eur),
             _ => Err(()),
         }
     }

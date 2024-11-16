@@ -13,20 +13,23 @@ use teloxide::{
     utils::command::BotCommands,
 };
 use rusqlite::Result;
+use crate::buttons::account::edit_account::handler_update_account_btn;
+use crate::buttons::account::set_category::handler_category_btn;
+use crate::buttons::account::set_location::handler_location_btn;
+use crate::buttons::account::set_type::handler_type_btn;
 use crate::buttons::edit_portfolio::handler_update_portfolio_btn;
 use crate::buttons::get_portfolio::handler_get_portfolio_btn;
-use crate::buttons::set_base_currency::handler_set_base_currency_btn;
-use crate::buttons::set_category::{handler_category_btn, Category};
+use crate::buttons::set_currency::{handler_set_base_currency_btn, handler_set_currency_btn};
 use crate::buttons::start::{handler_start_btn, StartButton};
-use crate::buttons::update_account::handler_update_account_btn;
 use crate::buttons::update_portfolio::handler_update_balance_btn;
 use crate::db::account::Account;
 use crate::db::db::DataBase;
 use crate::db::portfolio::Portfolio;
 use crate::enums::asset_location::AssetLocation;
 use crate::enums::asset_type::AssetType;
+use crate::enums::category::Category;
 use crate::enums::currency::Currency;
-use crate::utils::common::make_keyboard;
+use crate::utils::common::{make_keyboard, make_keyboard_string};
 
 type MyDialogue = Dialogue<State, ErasedStorage<State>>;
 type MyStorage = std::sync::Arc<ErasedStorage<State>>;
@@ -51,6 +54,9 @@ pub enum State {
     ListenBalanceAmountFor(String),
     ListenBalanceIncomeFor(String),
     ListenBalanceOutcomeFor(String),
+    ListenCurrencyFor(String),
+    ListenLocationFor(String),
+    ListenTypeFor(String),
     // Get client data from chat for each listen
     GotListenBalanceNameListenAccountButtons(String),
     GotNewBalanceName(String),
@@ -95,6 +101,9 @@ async fn main() {
                 .branch(dptree::case![State::ListenStartButtonsCallback].endpoint(handler_start_btn))
                 .branch(dptree::case![State::ListenGetPortfolioButtonsCallback].endpoint(handler_get_portfolio_btn))
                 .branch(dptree::case![State::ListenEditPortfolioButtonsCallback].endpoint(handler_update_portfolio_btn))
+                .branch(dptree::case![State::ListenCurrencyFor(balance_name)].endpoint(handler_set_currency_btn))
+                .branch(dptree::case![State::ListenLocationFor(balance_name)].endpoint(handler_location_btn))
+                .branch(dptree::case![State::ListenTypeFor(balance_name)].endpoint(handler_type_btn))
                 .branch(dptree::case![State::ListenSetBaseCurrencyButtonsCallback].endpoint(handler_set_base_currency_btn))
                 .branch(dptree::case![State::ListenCategoryCallback{balance_name, outcome}].endpoint(handler_category_btn))
                 .branch(dptree::case![State::ListenBalanceName].endpoint(handler_update_balance_btn))
@@ -167,7 +176,7 @@ async fn listen_new_balance_amount(
 ) -> HandlerResult {
     match msg.text().unwrap().parse::<u32>() {
         Ok(amount) => {
-            let balance = Account::new(balance_name, amount, Currency::RUB, AssetLocation::Other, AssetType::default());
+            let balance = Account::new(balance_name, amount, Currency::Rub, AssetLocation::Other, AssetType::default());
             let mut portfolio = Portfolio::get(msg.chat.id.0).unwrap_or(Portfolio::empty());
 
             portfolio.add_account(balance);
@@ -230,7 +239,9 @@ async fn listen_balance_outcome_amount(
     match msg.text().unwrap().parse::<u32>() {
         Ok(outcome) => {
             dialogue.update(State::ListenCategoryCallback { balance_name, outcome }).await?;
-            bot.send_message(msg.chat.id, "Выберите категорию трат:").reply_markup(make_keyboard(3, Category::VALUES.to_vec())).await?;
+            let buttons: Vec<String> = Category::iterator().map(|c| c.to_string()).collect();
+
+            bot.send_message(msg.chat.id, "Выберите категорию трат:").reply_markup(make_keyboard_string(3, buttons)).await?;
         }
         Err(_) => { todo!() }
     }

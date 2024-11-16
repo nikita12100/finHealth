@@ -1,4 +1,7 @@
+use std::slice::Iter;
+use std::str::FromStr;
 use strum_macros::Display;
+use crate::enums::asset_type::AssetType::*;
 
 #[derive(Clone, Debug, Display, Default, serde::Serialize, serde::Deserialize, PartialEq)]
 pub enum AssetType {
@@ -19,4 +22,37 @@ pub enum AssetType {
     Bond,
     #[strum(serialize = "bond$", to_string = "bond$")]
     BondCurrency,
+}
+
+impl AssetType {
+    pub fn iterator() -> Iter<'static, AssetType> {
+        static VALUES: [AssetType; 8] = [
+            Cash,
+            Crypto,
+            Repo,
+            Gold,
+            Deposit,
+            Share,
+            Bond,
+            BondCurrency,
+        ];
+        VALUES.iter()
+    }
+}
+
+impl FromStr for AssetType {
+    type Err = ();
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "cash" => Ok(Cash),
+            "crypto" => Ok(Crypto),
+            "repo" => Ok(Repo),
+            "gold" => Ok(Gold),
+            "deposit" => Ok(Deposit),
+            "share" => Ok(Share),
+            "bond" => Ok(Bond),
+            "bondCurrency" => Ok(BondCurrency),
+            _ => Err(()),
+        }
+    }
 }
