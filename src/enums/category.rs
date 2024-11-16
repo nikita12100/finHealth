@@ -3,7 +3,7 @@ use strum_macros::Display;
 use crate::enums::category::Category::*;
 
 #[derive(Clone, Debug, Display, Default, serde::Serialize, serde::Deserialize, PartialEq)]
-pub enum Category {
+pub enum Category { // todo serde in integer
     #[strum(serialize = "ApartmentRent", to_string = "🏢 Аренда кв")]
     ApartmentRent,
     #[strum(serialize = "CafesAndRestaurants", to_string = "🍽 Кафе и рестораны")]

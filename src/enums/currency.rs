@@ -3,15 +3,16 @@ use std::str::FromStr;
 use strum_macros::Display;
 use crate::enums::currency::Currency::*;
 
-#[derive(Clone, Debug, Display, Default, serde::Serialize, serde::Deserialize, PartialEq)]
+#[derive(Clone, Debug, Display, Default, serde_repr::Serialize_repr, serde_repr::Deserialize_repr, PartialEq)]
+#[repr(u8)]
 pub enum Currency {
     #[default]
-    #[strum(serialize = "RUB", to_string = "RUB")]
-    Rub,
-    #[strum(serialize = "USD", to_string = "USD")]
-    Usd,
-    #[strum(serialize = "EUR", to_string = "EUR")]
-    Eur,
+    #[strum(to_string = "RUB")]
+    Rub = 0,
+    #[strum(to_string = "USD")]
+    Usd = 1,
+    #[strum(to_string = "EUR")]
+    Eur = 2,
 }
 
 impl Currency {

@@ -7,7 +7,7 @@ use crate::utils::exchange_rate::Convert;
 #[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize, PartialEq)]
 pub struct BalanceTimed {
     amount: u32,
-    category: Option<String>,
+    category: Option<String>, // todo category enum
     #[serde(with = "ts_seconds")]
     date: DateTime<Utc>,
 }

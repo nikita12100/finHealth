@@ -1,4 +1,6 @@
+use std::str::FromStr;
 use chrono::{DateTime, Utc};
+use uuid::Uuid;
 use crate::db::balance_timed::BalanceTimed;
 use crate::db::portfolio::Portfolio;
 use crate::enums::asset_location::AssetLocation;
@@ -6,8 +8,9 @@ use crate::enums::asset_type::AssetType;
 use crate::enums::currency::Currency;
 use crate::utils::exchange_rate::Convert;
 
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct Account {
+    id: Uuid,
     name: String,
     currency: Currency,
     // risk_level: u32,
@@ -19,6 +22,7 @@ pub struct Account {
 impl Account {
     pub fn new_date(name: String, start_balance: u32, currency: Currency, asset_location: AssetLocation, asset_type: AssetType, date: DateTime<Utc>) -> Self {
         Account {
+            id: Uuid::new_v4(),
             name,
             currency,
             asset_location,
@@ -26,8 +30,19 @@ impl Account {
             balance: vec![BalanceTimed::new_date(start_balance, date)],
         }
     }
+    pub fn load_db(id: String, name: String, currency: Currency, asset_location: AssetLocation, asset_type: AssetType, balance: Vec<BalanceTimed>) -> Self {
+        Account {
+            id: Uuid::from_str(id.as_str()).unwrap(),
+            name,
+            currency,
+            asset_location,
+            asset_type,
+            balance,
+        }
+    }
     pub fn new(name: String, start_balance: u32, currency: Currency, asset_location: AssetLocation, asset_type: AssetType) -> Self {
         Account {
+            id: Uuid::new_v4(),
             name,
             currency,
             asset_location,
@@ -36,6 +51,7 @@ impl Account {
         }
     }
 
+    pub fn get_id(&self) -> Uuid { self.id }
     pub fn set_balance_amount(&mut self, new_amount: u32, category: Option<String>) {
         self.balance.push(BalanceTimed::new_category(new_amount, category));
     }
@@ -65,7 +81,7 @@ impl Account {
     pub fn set_currency(&mut self, c: Currency) { self.currency = c }
 
     pub fn get_location(&self) -> AssetLocation { self.asset_location.clone() }
-    pub fn set_location(&mut self, l: AssetLocation)  { self.asset_location = l }
+    pub fn set_location(&mut self, l: AssetLocation) { self.asset_location = l }
 
     pub fn get_type(&self) -> AssetType { self.asset_type.clone() }
     pub fn set_type(&mut self, t: AssetType) { self.asset_type = t }

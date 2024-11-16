@@ -3,25 +3,26 @@ use std::str::FromStr;
 use strum_macros::Display;
 use crate::enums::asset_type::AssetType::*;
 
-#[derive(Clone, Debug, Display, Default, serde::Serialize, serde::Deserialize, PartialEq)]
+#[derive(Clone, Debug, Display, Default, serde_repr::Serialize_repr, serde_repr::Deserialize_repr, PartialEq)]
+#[repr(u8)]
 pub enum AssetType {
     #[default]
-    #[strum(serialize = "cash", to_string = "cash")]
-    Cash,
-    #[strum(serialize = "crypto", to_string = "crypto")]
-    Crypto,
-    #[strum(serialize = "repo", to_string = "repo")]
-    Repo,
-    #[strum(serialize = "gold", to_string = "gold")]
-    Gold,
-    #[strum(serialize = "deposit", to_string = "deposit")]
-    Deposit,
-    #[strum(serialize = "share", to_string = "share")]
-    Share,
-    #[strum(serialize = "bond", to_string = "bond")]
-    Bond,
-    #[strum(serialize = "bond$", to_string = "bond$")]
-    BondCurrency,
+    #[strum(to_string = "cash")]
+    Cash = 0,
+    #[strum(to_string = "crypto")]
+    Crypto = 1,
+    #[strum(to_string = "repo")]
+    Repo = 2,
+    #[strum(to_string = "gold")]
+    Gold = 3,
+    #[strum(to_string = "deposit")]
+    Deposit = 4,
+    #[strum(to_string = "share")]
+    Share = 5,
+    #[strum(to_string = "bond")]
+    Bond = 6,
+    #[strum(to_string = "bond$")]
+    BondCurrency = 7,
 }
 
 impl AssetType {

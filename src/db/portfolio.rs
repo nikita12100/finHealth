@@ -2,7 +2,7 @@ use crate::db::account::Account;
 use crate::enums::currency::Currency;
 use crate::utils::exchange_rate::ExchangeRate;
 
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, Default)]
 pub struct Portfolio {
     accounts: Vec<Account>,
     base_currency: Currency,

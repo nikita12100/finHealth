@@ -3,25 +3,26 @@ use std::str::FromStr;
 use strum_macros::Display;
 use crate::enums::asset_location::AssetLocation::*;
 
-#[derive(Clone, Debug, Display, Default, serde::Serialize, serde::Deserialize, PartialEq)]
+#[derive(Clone, Debug, Display, Default, serde_repr::Serialize_repr, serde_repr::Deserialize_repr, PartialEq)]
+#[repr(u8)]
 pub enum AssetLocation {
     #[default]
-    #[strum(serialize = "Other", to_string = "Other")]
-    Other,
-    #[strum(serialize = "Broker1", to_string = "Broker1")]
-    Broker1,
-    #[strum(serialize = "Broker2", to_string = "Broker2")]
-    Broker2,
-    #[strum(serialize = "Broker3", to_string = "Broker3")]
-    Broker3,
-    #[strum(serialize = "Bank1", to_string = "Bank1")]
-    Bank1,
-    #[strum(serialize = "Bank2", to_string = "Bank2")]
-    Bank2,
-    #[strum(serialize = "Bank3", to_string = "Bank3")]
-    Bank3,
-    #[strum(serialize = "PocketMoney", to_string = "PocketMoney")]
-    PocketMoney,
+    #[strum(to_string = "Other")]
+    Other = 0,
+    #[strum(to_string = "Broker1")]
+    Broker1 = 1,
+    #[strum(to_string = "Broker2")]
+    Broker2 = 2,
+    #[strum(to_string = "Broker3")]
+    Broker3 = 3,
+    #[strum(to_string = "Bank1")]
+    Bank1 = 4,
+    #[strum(to_string = "Bank2")]
+    Bank2 = 5,
+    #[strum(to_string = "Bank3")]
+    Bank3 = 6,
+    #[strum(to_string = "PocketMoney")]
+    PocketMoney = 7,
 }
 
 impl AssetLocation {
