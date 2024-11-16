@@ -79,7 +79,7 @@ async fn main() {
 
     let bot = Bot::from_env();
 
-    Portfolio::create_table().unwrap();
+    Portfolio::create_tables().unwrap();
 
     let storage: MyStorage = SqliteStorage::open("state.sqlite", Json).await.unwrap().erase();
 

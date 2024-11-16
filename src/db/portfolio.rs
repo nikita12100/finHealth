@@ -17,6 +17,9 @@ impl Portfolio {
             exchange_rate: ExchangeRate::new(95.0, 100.0, 0.93),
         }
     }
+    pub fn new(accounts: Vec<Account>, base_currency: Currency, exchange_rate: ExchangeRate) -> Portfolio {
+        Portfolio { accounts, base_currency, exchange_rate }
+    }
 
     pub fn get_all_accounts(&self) -> &Vec<Account> { &self.accounts }
     pub fn get_exchange_rate(&self) -> &ExchangeRate { &self.exchange_rate }
