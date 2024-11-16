@@ -28,7 +28,7 @@ pub async fn handler_location_btn(
     let chat_id = q.chat_id().unwrap();
 
     if let Some(ref data) = q.data {
-        let location: AssetLocation = AssetLocation::from_str(q.data.unwrap().as_str()).unwrap();
+        let location: AssetLocation = AssetLocation::from_str(data.as_str()).unwrap();
         let mut portfolio = Portfolio::get(chat_id.0).unwrap_or(Portfolio::empty());
 
         portfolio.get_account_mut(&*balance_name).unwrap().set_location(location);

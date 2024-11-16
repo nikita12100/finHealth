@@ -60,12 +60,16 @@ impl Account {
     }
     pub fn get_name(&self) -> String { self.name.clone() }
     pub fn get_name_str(&self) -> &str { &self.name }
+
     pub fn get_currency(&self) -> &Currency { &self.currency }
     pub fn set_currency(&mut self, c: Currency) { self.currency = c }
+
     pub fn get_location(&self) -> AssetLocation { self.asset_location.clone() }
     pub fn set_location(&mut self, l: AssetLocation)  { self.asset_location = l }
+
     pub fn get_type(&self) -> AssetType { self.asset_type.clone() }
     pub fn set_type(&mut self, t: AssetType) { self.asset_type = t }
+
     pub fn get_last_amount(&self) -> Option<u32> { self.balance.last().map(|x| x.get_amount()) }
 
     pub fn get_last_amount_bc(&self, portfolio: &Portfolio) -> Option<u32> {

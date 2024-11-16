@@ -33,7 +33,7 @@ pub async fn handler_start_btn(bot: Bot, dialogue: MyDialogue, q: CallbackQuery)
         StartButton::UPDATE_PORTFOLIO => {
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "Вы хотите обновить портфель...").await?;
 
-            let portfolio = Portfolio::get(q.chat_id().unwrap().0)?;
+            let portfolio = Portfolio::get(q.chat_id().unwrap().0).unwrap();
             let mut balances = portfolio.get_account_names_str();
             balances.extend(UpdatePortfolioButton::VALUES);
 

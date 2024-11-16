@@ -21,7 +21,7 @@ impl ButtonCurrency {
 pub async fn handler_set_base_currency_btn(bot: Bot, dialogue: MyDialogue, q: CallbackQuery) -> HandlerResult {
     let chat_id =  q.chat_id().unwrap();
     if ButtonCurrency::get_currencies().contains(&q.data.clone().unwrap()) {
-        let mut portfolio = Portfolio::get(chat_id.0)?;
+        let mut portfolio = Portfolio::get(chat_id.0).unwrap();
         let new_base_currency = Currency::from_str(q.data.unwrap().as_str()).unwrap();
         portfolio.set_base_currency(new_base_currency.clone());
         portfolio.save(chat_id)?;
@@ -38,7 +38,7 @@ pub async fn handler_set_base_currency_btn(bot: Bot, dialogue: MyDialogue, q: Ca
 pub async fn handler_set_currency_btn(bot: Bot, dialogue: MyDialogue,  balance_name: String, q: CallbackQuery) -> HandlerResult {
     let chat_id =  q.chat_id().unwrap();
     if ButtonCurrency::get_currencies().contains(&q.data.clone().unwrap()) {
-        let mut portfolio = Portfolio::get(chat_id.0)?;
+        let mut portfolio = Portfolio::get(chat_id.0).unwrap();
         let new_base_currency = Currency::from_str(q.data.unwrap().as_str()).unwrap();
         portfolio.get_account_mut(&balance_name).unwrap().set_currency(new_base_currency.clone());
         portfolio.save(chat_id)?;

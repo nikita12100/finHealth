@@ -1,4 +1,3 @@
-use std::fmt::format;
 use teloxide::Bot;
 use teloxide::dispatching::dialogue::GetChatId;
 use teloxide::payloads::SendMessageSetters;
@@ -37,7 +36,7 @@ pub async fn handler_update_account_btn(bot: Bot, dialogue: MyDialogue, balance_
     bot.answer_callback_query(&q.id).await?;
     let chat_id = q.chat_id().unwrap();
 
-    let mut portfolio = Portfolio::get(q.chat_id().unwrap().0)?;
+    let mut portfolio = Portfolio::get(q.chat_id().unwrap().0).unwrap();
 
     match q.data.clone().unwrap().as_str() {
         EditAccountButton::SET_BALANCE => {

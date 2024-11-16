@@ -35,7 +35,7 @@ impl GetPortfolioButtons {
 pub async fn handler_get_portfolio_btn(bot: Bot, dialogue: MyDialogue, q: CallbackQuery) -> HandlerResult {
     bot.answer_callback_query(&q.id).await?;
     let chat_id = q.chat_id().unwrap();
-    let portfolio = Portfolio::get(q.chat_id().unwrap().0)?;
+    let portfolio = Portfolio::get(q.chat_id().unwrap().0).unwrap();
 
     match q.data.clone().unwrap().as_str() {
         GetPortfolioButtons::DRAW_NAME_ALLOCATIONS => {

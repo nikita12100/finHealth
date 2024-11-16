@@ -32,17 +32,17 @@ pub async fn handler_update_balance_btn(bot: Bot, dialogue: MyDialogue, q: Callb
         _ => {
             let portfolio_opt = Portfolio::get(q.chat_id().unwrap().0);
             match portfolio_opt {
-                Err(_) => {
+                None => {
                     bot.send_message(chat_id, "У вас еще нет баланса, введите имя для нового баланса:").await?;
                     dialogue.update(State::ListenNewBalanceName).await?;
                 }
-                Ok(portfolio) => {
+                Some(portfolio) => {
                     let balances = portfolio.get_account_names();
                     let chosen_balance = q.data.unwrap();
                     assert!(balances.contains(&chosen_balance));
 
                     bot.send_message(chat_id, format!("Вы хотите изменить {:?}, выберете действие:", chosen_balance))
-                        .reply_markup(make_keyboard(1, EditAccountButton::VALUES.to_vec())).await?;
+                        .reply_markup(make_keyboard(1, EditAccountButton::VALUES.to_vec())).await.unwrap();
                     dialogue.update(State::GotListenBalanceNameListenAccountButtons(chosen_balance)).await?;
                 }
             }
