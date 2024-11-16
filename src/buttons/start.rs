@@ -44,7 +44,7 @@ pub async fn handler_start_btn(bot: Bot, dialogue: MyDialogue, q: CallbackQuery)
         StartButton::HELP => {
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to HELP").await?;
 
-            MockData::create().save(chat_id.0)?;
+            MockData::create().save(chat_id)?;
 
             start_again(bot, dialogue, chat_id).await?;
         }

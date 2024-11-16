@@ -60,7 +60,7 @@ pub async fn handler_category_btn(
         let mut portfolio = Portfolio::get(chat_id.0).unwrap_or(Portfolio::empty());
 
         portfolio.get_account_mut(&*balance_name).unwrap().add_balance_outcome(outcome, category);
-        portfolio.save(chat_id.0)?;
+        portfolio.save(chat_id)?;
 
         start_again(bot, dialogue, chat_id).await?;
     } else {

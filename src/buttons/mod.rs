@@ -4,3 +4,4 @@ pub mod start;
 pub mod edit_portfolio;
 pub mod update_account;
 pub mod set_category;
+pub mod set_base_currency;

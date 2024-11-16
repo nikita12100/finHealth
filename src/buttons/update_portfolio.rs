@@ -11,9 +11,11 @@ use crate::db::db::DataBase;
 pub struct UpdatePortfolioButton;
 
 impl UpdatePortfolioButton {
-    pub const EDIT_BALANCES: &'static str = "Редактировать балансы";
+    pub const EDIT_BALANCES: &'static str = "Редактировать портфель";
 
-    pub const VALUES: &'static [&'static str; 1] = &[Self::EDIT_BALANCES];
+    pub const VALUES: &'static [&'static str; 1] = &[
+        Self::EDIT_BALANCES,
+    ];
 }
 
 pub async fn handler_update_balance_btn(bot: Bot, dialogue: MyDialogue, q: CallbackQuery) -> HandlerResult {

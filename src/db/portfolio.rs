@@ -5,8 +5,8 @@ use crate::utils::exchange_rate::ExchangeRate;
 #[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct Portfolio {
     accounts: Vec<Account>,
-    base_currency: Currency,  // add buttons
-    exchange_rate: ExchangeRate,  // add buttons
+    base_currency: Currency,
+    exchange_rate: ExchangeRate,
 }
 
 impl Portfolio {
@@ -21,6 +21,7 @@ impl Portfolio {
     pub fn get_all_accounts(&self) -> &Vec<Account> { &self.accounts }
     pub fn get_exchange_rate(&self) -> &ExchangeRate { &self.exchange_rate }
     pub fn get_base_currency(&self) -> &Currency { &self.base_currency }
+    pub fn set_base_currency(&mut self, c: Currency) { self.base_currency = c }
     pub fn get_account_names(&self) -> Vec<String> {
         self.accounts.iter().map(|account| account.get_name().clone()).collect()
     }

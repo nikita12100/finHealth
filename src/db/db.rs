@@ -1,11 +1,13 @@
 use rusqlite::{named_params, Connection};
+use teloxide::types::ChatId;
 use crate::db::portfolio::Portfolio;
 
 type HandlerResult<T> = rusqlite::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
 pub trait DataBase {
     fn create_table() -> HandlerResult<()>;
-    fn save(&self, id: i64) -> HandlerResult<()>;
+    fn save(&self, id: ChatId) -> HandlerResult<()>;
+    fn save_id(&self, id: i64) -> HandlerResult<()>;
     fn get(id: i64) -> HandlerResult<Portfolio>;
 }
 
@@ -24,7 +26,8 @@ impl DataBase for Portfolio {
         Ok(())
     }
 
-    fn save(&self, id: i64) -> HandlerResult<()> {
+    fn save(&self, id: ChatId) -> HandlerResult<()> { Self::save_id(self, id.0) }
+    fn save_id(&self, id: i64) -> HandlerResult<()> {
         let conn = Connection::open("portfolios.db").unwrap();
         let mut stmt = conn.prepare("INSERT INTO portfolio (id, data) VALUES (:id, :data) ON CONFLICT (id) DO UPDATE SET data=EXCLUDED.data")?;
 

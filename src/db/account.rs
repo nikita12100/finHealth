@@ -9,10 +9,10 @@ use crate::utils::exchange_rate::Convert;
 #[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct Account {
     name: String,
-    currency: Currency, // add buttons
+    currency: Currency,
     // risk_level: u32,
-    asset_location: AssetLocation, // add buttons
-    asset_type: AssetType, // add buttons
+    asset_location: AssetLocation,
+    asset_type: AssetType,
     balance: Vec<BalanceTimed>,
 }
 

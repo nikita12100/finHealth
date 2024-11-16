@@ -15,6 +15,7 @@ use teloxide::{
 use rusqlite::Result;
 use crate::buttons::edit_portfolio::handler_update_portfolio_btn;
 use crate::buttons::get_portfolio::handler_get_portfolio_btn;
+use crate::buttons::set_base_currency::handler_set_base_currency_btn;
 use crate::buttons::set_category::{handler_category_btn, Category};
 use crate::buttons::start::{handler_start_btn, StartButton};
 use crate::buttons::update_account::handler_update_account_btn;
@@ -39,6 +40,7 @@ pub enum State {
     ListenStartButtonsCallback,
     ListenGetPortfolioButtonsCallback,
     ListenEditPortfolioButtonsCallback,
+    ListenSetBaseCurrencyButtonsCallback,
     ListenCategoryCallback {
         balance_name: String,
         outcome: u32,
@@ -93,6 +95,7 @@ async fn main() {
                 .branch(dptree::case![State::ListenStartButtonsCallback].endpoint(handler_start_btn))
                 .branch(dptree::case![State::ListenGetPortfolioButtonsCallback].endpoint(handler_get_portfolio_btn))
                 .branch(dptree::case![State::ListenEditPortfolioButtonsCallback].endpoint(handler_update_portfolio_btn))
+                .branch(dptree::case![State::ListenSetBaseCurrencyButtonsCallback].endpoint(handler_set_base_currency_btn))
                 .branch(dptree::case![State::ListenCategoryCallback{balance_name, outcome}].endpoint(handler_category_btn))
                 .branch(dptree::case![State::ListenBalanceName].endpoint(handler_update_balance_btn))
                 .branch(dptree::case![State::GotListenBalanceNameListenAccountButtons(balance_name)].endpoint(handler_update_account_btn))
@@ -168,7 +171,7 @@ async fn listen_new_balance_amount(
             let mut portfolio = Portfolio::get(msg.chat.id.0).unwrap_or(Portfolio::empty());
 
             portfolio.add_account(balance);
-            portfolio.save(msg.chat.id.0)?;
+            portfolio.save(msg.chat.id)?;
 
             bot.send_message(msg.chat.id, format!("portfolio saved {:#?}", portfolio)).await?;
             start_again(bot, dialogue, msg.chat.id).await?;
@@ -189,7 +192,7 @@ async fn listen_balance_new_amount(
             let mut portfolio = Portfolio::get(msg.chat.id.0).unwrap_or(Portfolio::empty());
 
             portfolio.get_account_mut(&*balance_name).unwrap().set_balance_amount(new_balance, None);
-            portfolio.save(msg.chat.id.0)?;
+            portfolio.save(msg.chat.id)?;
             bot.send_message(msg.chat.id, format!("portfolio updated {:#?}", portfolio)).await?;
             start_again(bot, dialogue, msg.chat.id).await?;
         }
@@ -209,7 +212,7 @@ async fn listen_balance_income_amount(
             let mut portfolio = Portfolio::get(msg.chat.id.0).unwrap_or(Portfolio::empty());
 
             portfolio.get_account_mut(&*balance_name).unwrap().add_balance_income(income);
-            portfolio.save(msg.chat.id.0)?;
+            portfolio.save(msg.chat.id)?;
             bot.send_message(msg.chat.id, format!("portfolio updated {:#?}", portfolio)).await?;
             start_again(bot, dialogue, msg.chat.id).await?;
         }
