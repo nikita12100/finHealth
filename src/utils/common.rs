@@ -1,4 +1,5 @@
 use plotters::style::RGBColor;
+use teloxide::types::{InlineKeyboardButton, InlineKeyboardMarkup};
 
 pub fn total_sum_spaced(total_summ: u32) -> String {
     let mut total_sum_str: Vec<char> = Vec::new();
@@ -29,4 +30,19 @@ pub fn generate_colors(size: u8, base_color: RGBColor) -> Vec<RGBColor> {
     }
 
     colors
+}
+
+pub fn make_keyboard(row_size: usize, buttons: Vec<&str>) -> InlineKeyboardMarkup {
+    let mut keyboard: Vec<Vec<InlineKeyboardButton>> = vec![];
+
+    for versions in buttons.chunks(row_size) {
+        let row = versions
+            .iter()
+            .map(|&version| InlineKeyboardButton::callback(version.to_owned(), version.to_owned()))
+            .collect();
+
+        keyboard.push(row);
+    }
+
+    InlineKeyboardMarkup::new(keyboard)
 }

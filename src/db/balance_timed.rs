@@ -1,7 +1,8 @@
 use chrono::{DateTime, Utc};
 use chrono::serde::ts_seconds;
+use crate::db::portfolio::Portfolio;
 use crate::enums::currency::Currency;
-use crate::utils::exchange_rate::ExchangeRate;
+use crate::utils::exchange_rate::Convert;
 
 #[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct BalanceTimed {
@@ -13,8 +14,8 @@ pub struct BalanceTimed {
 
 impl BalanceTimed {
     pub fn get_amount(&self) -> u32 { self.amount }
-    pub fn get_amount_bc(&self, exchange: &ExchangeRate, base_currency: Currency, current_currency: Currency) -> u32 {
-        exchange.convert(self.amount as f32, current_currency.clone(), base_currency) as u32
+    pub fn get_amount_bc(&self, portfolio: &Portfolio, current_currency: &Currency) -> u32 {
+        portfolio.convert(self.amount, current_currency)
     }
     pub fn get_category(&self) -> Option<String> { self.category.clone() }
     pub fn get_date(&self) -> DateTime<Utc> { self.date.clone() }

@@ -1,3 +1,4 @@
+use crate::db::portfolio::Portfolio;
 use crate::enums::currency::Currency;
 
 #[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
@@ -22,8 +23,8 @@ impl ExchangeRate {
             eur_usd: 1.0 / usd_eur,
         }
     }
-    pub fn convert(&self, amount: f32, from: Currency, to: Currency) -> f32 {
-        if from == to { amount } else {
+    pub fn convert(&self, amount: f32, from: &Currency, to: &Currency) -> f32 {
+        if from.eq(to) { amount } else {
             match from {
                 Currency::RUB => {
                     match to {
@@ -48,5 +49,15 @@ impl ExchangeRate {
                 }
             }
         }
+    }
+}
+
+pub trait Convert {
+    fn convert(&self, amount: u32, from: &Currency) -> u32;
+}
+
+impl Convert for Portfolio {
+    fn convert(&self, amount: u32, from: &Currency) -> u32 {
+        self.get_exchange_rate().convert(amount as f32, from, self.get_base_currency()) as u32
     }
 }

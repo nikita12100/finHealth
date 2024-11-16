@@ -2,6 +2,8 @@ use teloxide::Bot;
 use teloxide::dispatching::dialogue::GetChatId;
 use teloxide::prelude::{CallbackQuery, Requester};
 use crate::{start_again, HandlerResult, MyDialogue};
+use crate::charts::draw_line::DrawLine;
+use crate::charts::draw_pie::DrawPie;
 use crate::db::portfolio::Portfolio;
 use crate::db::db::DataBase;
 
@@ -33,68 +35,53 @@ impl GetPortfolioButtons {
 pub async fn handler_get_portfolio_btn(bot: Bot, dialogue: MyDialogue, q: CallbackQuery) -> HandlerResult {
     bot.answer_callback_query(&q.id).await?;
     let chat_id = q.chat_id().unwrap();
+    let portfolio = Portfolio::get(q.chat_id().unwrap().0)?;
 
     match q.data.clone().unwrap().as_str() {
         GetPortfolioButtons::DRAW_NAME_ALLOCATIONS => {
-            let portfolio = Portfolio::get(q.chat_id().unwrap().0)?;
-            let pie_chart = portfolio.draw_pie_current_allocations();
+            let pie_chart = portfolio.draw_pie_name_allocations();
 
             bot.send_photo(chat_id, pie_chart).await?;
-
             start_again(bot, dialogue, chat_id).await?;
         }
         GetPortfolioButtons::DRAW_CURRENCY_ALLOCATIONS => {
-            let portfolio = Portfolio::get(q.chat_id().unwrap().0)?;
             let pie_chart = portfolio.draw_pie_currency_allocations();
 
             bot.send_photo(chat_id, pie_chart).await?;
-
             start_again(bot, dialogue, chat_id).await?;
         }
         GetPortfolioButtons::DRAW_LOCATION_ALLOCATIONS => {
-            let portfolio = Portfolio::get(q.chat_id().unwrap().0)?;
             let pie_chart = portfolio.draw_pie_location_allocations();
 
             bot.send_photo(chat_id, pie_chart).await?;
-
             start_again(bot, dialogue, chat_id).await?;
         }
         GetPortfolioButtons::DRAW_TYPE_ALLOCATIONS => {
-            let portfolio = Portfolio::get(q.chat_id().unwrap().0)?;
             let pie_chart = portfolio.draw_pie_type_allocations();
 
             bot.send_photo(chat_id, pie_chart).await?;
-
             start_again(bot, dialogue, chat_id).await?;
         }
         GetPortfolioButtons::DRAW_WEEK_SPENDS => {
-            let portfolio = Portfolio::get(q.chat_id().unwrap().0)?;
             let pie_chart = portfolio.draw_pie_spends("daily".to_string(), 7);
 
             bot.send_photo(chat_id, pie_chart).await?;
-
             start_again(bot, dialogue, chat_id).await?;
         }
         GetPortfolioButtons::DRAW_MONTH_SPENDS => {
-            let portfolio = Portfolio::get(q.chat_id().unwrap().0)?;
             let pie_chart = portfolio.draw_pie_spends("daily".to_string(), 30);
 
             bot.send_photo(chat_id, pie_chart).await?;
-
             start_again(bot, dialogue, chat_id).await?;
         }
         GetPortfolioButtons::DRAW_LINE_ALL_HIST => {
-            let portfolio = Portfolio::get(q.chat_id().unwrap().0)?;
             let line_chart = portfolio.draw_line_test();
 
             bot.send_photo(chat_id, line_chart).await?;
-
             start_again(bot, dialogue, chat_id).await?;
         }
         GetPortfolioButtons::RAW_BALANCE => {
-            let portfolio = Portfolio::get(q.chat_id().unwrap().0)?;
             bot.send_message(chat_id, format!("Ваш портфель: {:#?}", portfolio)).await?;
-
             start_again(bot, dialogue, chat_id).await?;
         }
 

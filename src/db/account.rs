@@ -1,9 +1,10 @@
 use chrono::{DateTime, Utc};
 use crate::db::balance_timed::BalanceTimed;
+use crate::db::portfolio::Portfolio;
 use crate::enums::asset_location::AssetLocation;
 use crate::enums::asset_type::AssetType;
 use crate::enums::currency::Currency;
-use crate::utils::exchange_rate::ExchangeRate;
+use crate::utils::exchange_rate::Convert;
 
 #[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct Account {
@@ -16,7 +17,6 @@ pub struct Account {
 }
 
 impl Account {
-
     pub fn new_date(name: String, start_balance: u32, currency: Currency, asset_location: AssetLocation, asset_type: AssetType, date: DateTime<Utc>) -> Self {
         Account {
             name,
@@ -60,13 +60,14 @@ impl Account {
     }
     pub fn get_name(&self) -> String { self.name.clone() }
     pub fn get_name_str(&self) -> &str { &self.name }
-    pub fn get_currency(&self) -> Currency { self.currency.clone() }
+    pub fn get_currency(&self) -> &Currency { &self.currency }
     pub fn get_location(&self) -> AssetLocation { self.asset_location.clone() }
     pub fn get_type(&self) -> AssetType { self.asset_type.clone() }
     pub fn get_last_amount(&self) -> Option<u32> { self.balance.last().map(|x| x.get_amount()) }
-    pub fn get_last_amount_bc(&self, exchange: &ExchangeRate, base_currency: Currency) -> Option<u32> {
-        if let Some(balance) = self.balance.last().map(|x| x.get_amount()) {
-            Some(exchange.convert(balance as f32, self.currency.clone(), base_currency) as u32)
+
+    pub fn get_last_amount_bc(&self, portfolio: &Portfolio) -> Option<u32> {
+        if let Some(balance_amount) = self.balance.last().map(|x| x.get_amount()) {
+            Some(portfolio.convert(balance_amount, &self.currency))
         } else {
             None
         }

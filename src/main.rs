@@ -13,7 +13,6 @@ use teloxide::{
     utils::command::BotCommands,
 };
 use rusqlite::Result;
-use teloxide::types::{InlineKeyboardButton, InlineKeyboardMarkup};
 use crate::buttons::edit_portfolio::handler_update_portfolio_btn;
 use crate::buttons::get_portfolio::handler_get_portfolio_btn;
 use crate::buttons::set_category::{handler_category_btn, Category};
@@ -26,6 +25,7 @@ use crate::db::portfolio::Portfolio;
 use crate::enums::asset_location::AssetLocation;
 use crate::enums::asset_type::AssetType;
 use crate::enums::currency::Currency;
+use crate::utils::common::make_keyboard;
 
 type MyDialogue = Dialogue<State, ErasedStorage<State>>;
 type MyStorage = std::sync::Arc<ErasedStorage<State>>;
@@ -124,21 +124,6 @@ async fn start_again(bot: Bot, dialogue: MyDialogue, chat_id: ChatId) -> Handler
     bot.send_message(chat_id, intro_text).reply_markup(make_keyboard(1, StartButton::VALUES.to_vec())).await?;
 
     Ok(())
-}
-
-fn make_keyboard(row_size: usize, buttons: Vec<&str>) -> InlineKeyboardMarkup {
-    let mut keyboard: Vec<Vec<InlineKeyboardButton>> = vec![];
-
-    for versions in buttons.chunks(row_size) {
-        let row = versions
-            .iter()
-            .map(|&version| InlineKeyboardButton::callback(version.to_owned(), version.to_owned()))
-            .collect();
-
-        keyboard.push(row);
-    }
-
-    InlineKeyboardMarkup::new(keyboard)
 }
 
 async fn handler_print(bot: Bot, q: CallbackQuery) -> HandlerResult {

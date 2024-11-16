@@ -21,22 +21,22 @@ impl MockData {
         let a7 = Account::new_date("обилиги руб".parse().unwrap(), 307555, Currency::RUB, AssetLocation::Broker2, AssetType::Bond, Utc.with_ymd_and_hms(2024, 11, 1, 21, 15, 55).unwrap());
         let a8 = Account::new_date("обилиги $".parse().unwrap(), 2389, Currency::USD, AssetLocation::Broker2, AssetType::BondCurrency, Utc.with_ymd_and_hms(2024, 11, 1, 21, 1, 55).unwrap());
         let a9 = Account::new_date("daily".parse().unwrap(), 100000, Currency::RUB, AssetLocation::Bank1, AssetType::Cash, Utc.with_ymd_and_hms(2024, 11, 1, 21, 29, 55).unwrap());
-        // p.add_account(a1);
-        // p.add_account(a2);
-        // p.add_account(a3);
-        // p.add_account(a33);
-        // p.add_account(a4);
-        // p.add_account(a5);
-        // p.add_account(a6);
+        p.add_account(a1);
+        p.add_account(a2);
+        p.add_account(a3);
+        p.add_account(a33);
+        p.add_account(a4);
+        p.add_account(a5);
+        p.add_account(a6);
         p.add_account(a7);
         p.add_account(a8);
         p.add_account(a9);
 
-        // p.get_account_mut("крипта").unwrap().add_balance_income_date(50000, Utc.with_ymd_and_hms(2024, 11, 3, 21, 1, 55).unwrap());
-        // p.get_account_mut("TMON").unwrap().add_balance_income_date(5000, Utc.with_ymd_and_hms(2024, 11, 3, 21, 1, 55).unwrap());
-        // p.get_account_mut("TPAY").unwrap().add_balance_income_date(100500, Utc.with_ymd_and_hms(2024, 11, 3, 21, 1, 55).unwrap());
-        // p.get_account_mut("металл").unwrap().add_balance_income_date(15000, Utc.with_ymd_and_hms(2024, 11, 3, 21, 1, 55).unwrap());
-        // p.get_account_mut("вклад").unwrap().add_balance_outcome_date(15000, Category::OTHER.to_string(), Utc.with_ymd_and_hms(2024, 11, 3, 21, 1, 55).unwrap());
+        p.get_account_mut("крипта").unwrap().add_balance_income_date(50000, Utc.with_ymd_and_hms(2024, 11, 3, 21, 1, 55).unwrap());
+        p.get_account_mut("TMON").unwrap().add_balance_income_date(5000, Utc.with_ymd_and_hms(2024, 11, 3, 21, 1, 55).unwrap());
+        p.get_account_mut("TPAY").unwrap().add_balance_income_date(100500, Utc.with_ymd_and_hms(2024, 11, 3, 21, 1, 55).unwrap());
+        p.get_account_mut("металл").unwrap().add_balance_income_date(15000, Utc.with_ymd_and_hms(2024, 11, 3, 21, 1, 55).unwrap());
+        p.get_account_mut("вклад").unwrap().add_balance_outcome_date(15000, Category::OTHER.to_string(), Utc.with_ymd_and_hms(2024, 11, 3, 21, 1, 55).unwrap());
 
         p.get_account_mut("daily").unwrap().add_balance_outcome_date(10000, Category::TAXI.to_string(), Utc.with_ymd_and_hms(2024, 11, 2, 22, 1, 55).unwrap());
         p.get_account_mut("daily").unwrap().add_balance_outcome_date(5000, Category::PRODUCTS.to_string(), Utc.with_ymd_and_hms(2024, 11, 3, 21, 15, 55).unwrap());
