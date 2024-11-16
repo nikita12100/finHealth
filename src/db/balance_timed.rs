@@ -4,7 +4,7 @@ use crate::db::portfolio::Portfolio;
 use crate::enums::currency::Currency;
 use crate::utils::exchange_rate::Convert;
 
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize, PartialEq)]
 pub struct BalanceTimed {
     amount: u32,
     category: Option<String>,

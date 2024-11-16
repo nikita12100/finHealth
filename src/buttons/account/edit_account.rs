@@ -1,8 +1,9 @@
+use std::fmt::format;
 use teloxide::Bot;
 use teloxide::dispatching::dialogue::GetChatId;
 use teloxide::payloads::SendMessageSetters;
 use teloxide::prelude::{CallbackQuery, Requester};
-use crate::{HandlerResult, MyDialogue, State};
+use crate::{start_again, HandlerResult, MyDialogue, State};
 use crate::buttons::account::set_location::ButtonLocation;
 use crate::buttons::account::set_type::ButtonType;
 use crate::buttons::set_currency::ButtonCurrency;
@@ -19,14 +20,16 @@ impl EditAccountButton {
     pub const SET_CURRENCY: &'static str = "Изменить валюту счета";
     pub const SET_LOCATION: &'static str = "Изменить ??локацию??";
     pub const SET_TYPE: &'static str = "Изменить тип счета";
+    pub const REMOVE_BALANCE: &'static str = "Удалить этот баланс";
 
-    pub const VALUES: &'static [&'static str; 6] = &[
+    pub const VALUES: &'static [&'static str; 7] = &[
         Self::SET_BALANCE,
         Self::INCOME_AMOUNT,
         Self::OUTCOME_AMOUNT,
         Self::SET_CURRENCY,
         Self::SET_LOCATION,
         Self::SET_TYPE,
+        Self::REMOVE_BALANCE,
     ];
 }
 
@@ -34,7 +37,7 @@ pub async fn handler_update_account_btn(bot: Bot, dialogue: MyDialogue, balance_
     bot.answer_callback_query(&q.id).await?;
     let chat_id = q.chat_id().unwrap();
 
-    let portfolio = Portfolio::get(q.chat_id().unwrap().0)?;
+    let mut portfolio = Portfolio::get(q.chat_id().unwrap().0)?;
 
     match q.data.clone().unwrap().as_str() {
         EditAccountButton::SET_BALANCE => {
@@ -71,7 +74,17 @@ pub async fn handler_update_account_btn(bot: Bot, dialogue: MyDialogue, balance_
             dialogue.update(State::ListenTypeFor(balance_name)).await?;
             bot.send_message(chat_id, "Chose").reply_markup(make_keyboard_string(1, ButtonType::get_types())).await?;
         }
-        _ => { todo!() }
+        EditAccountButton::REMOVE_BALANCE => {
+            bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to REMOVE_BALANCE").await?;
+            let account = portfolio.get_account(&*balance_name).unwrap();
+
+
+            portfolio.delete_account(&account);
+            portfolio.save(chat_id)?;
+            bot.send_message(chat_id, format!("Баланс {} успешно удален", account.get_name())).await?;
+            start_again(bot, dialogue, chat_id).await?;
+        }
+        _ => { panic!("Error parsing answer") }
     }
     Ok(())
 }

@@ -48,7 +48,9 @@ pub async fn handler_start_btn(bot: Bot, dialogue: MyDialogue, q: CallbackQuery)
 
             start_again(bot, dialogue, chat_id).await?;
         }
-        _ => { todo!() }
+        _ => {
+            panic!("Error parsing answer")
+        }
     }
     Ok(())
 }

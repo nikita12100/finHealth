@@ -163,7 +163,7 @@ async fn listen_new_balance_name(
             dialogue.update(State::GotNewBalanceName(name.to_string())).await?;
             Ok(())
         }
-        None => { todo!() }
+        None => { panic!("Error parsing answer") }
     }
 }
 
@@ -187,7 +187,7 @@ async fn listen_new_balance_amount(
 
             Ok(())
         }
-        Err(_) => { todo!() }
+        Err(_) => { panic!("Error parsing answer") }
     }
 }
 async fn listen_balance_new_amount(
@@ -205,7 +205,7 @@ async fn listen_balance_new_amount(
             bot.send_message(msg.chat.id, format!("portfolio updated {:#?}", portfolio)).await?;
             start_again(bot, dialogue, msg.chat.id).await?;
         }
-        Err(_) => { todo!() }
+        Err(_) => { panic!("Error parsing answer") }
     }
     Ok(())
 }
@@ -225,7 +225,7 @@ async fn listen_balance_income_amount(
             bot.send_message(msg.chat.id, format!("portfolio updated {:#?}", portfolio)).await?;
             start_again(bot, dialogue, msg.chat.id).await?;
         }
-        Err(_) => { todo!() }
+        Err(_) => { panic!("Error parsing answer") }
     }
     Ok(())
 }
@@ -243,7 +243,7 @@ async fn listen_balance_outcome_amount(
 
             bot.send_message(msg.chat.id, "Выберите категорию трат:").reply_markup(make_keyboard_string(3, buttons)).await?;
         }
-        Err(_) => { todo!() }
+        Err(_) => { panic!("Error parsing answer") }
     }
     Ok(())
 }

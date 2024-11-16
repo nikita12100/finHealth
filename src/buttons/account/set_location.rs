@@ -36,7 +36,7 @@ pub async fn handler_location_btn(
 
         start_again(bot, dialogue, chat_id).await?;
     } else {
-        todo!()
+        panic!("Error parsing answer")
     }
     Ok(())
 }

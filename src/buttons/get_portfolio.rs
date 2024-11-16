@@ -85,7 +85,7 @@ pub async fn handler_get_portfolio_btn(bot: Bot, dialogue: MyDialogue, q: Callba
             start_again(bot, dialogue, chat_id).await?;
         }
 
-        _ => { todo!() }
+        _ => { panic!("Error parsing answer") }
     }
     Ok(())
 }

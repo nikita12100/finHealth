@@ -24,7 +24,7 @@ pub async fn handler_category_btn(
 
         start_again(bot, dialogue, chat_id).await?;
     } else {
-        todo!()
+        panic!("Error parsing answer")
     }
     Ok(())
 }
