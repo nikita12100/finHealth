@@ -6,6 +6,7 @@ use crate::charts::line_series::{Line, LineChart, Series};
 use crate::charts::pie_chart::{PieChart, PiePiece};
 use crate::db::account::Account;
 use crate::enums::currency::Currency;
+use crate::utils::common::total_sum_spaced;
 use crate::utils::exchange_rate::ExchangeRate;
 
 #[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
@@ -48,7 +49,7 @@ impl Portfolio {
             parts.push(PiePiece { size: value as f64, label: key });
         }
 
-        PieChart::create(parts, title, Some(Self::total_sum_spaced(total_summ)))
+        PieChart::create(parts, title, Some(total_sum_spaced(total_summ)))
     }
 
     pub fn draw_pie_spends(&self, account_name: String, num_days: u64) -> InputFile {
@@ -120,26 +121,12 @@ impl Portfolio {
     pub fn draw_line_test(&self) -> InputFile {
         let data = self.accounts.iter().map(|account| {
             let series = account.get_balances().iter().map(|balance| {
-                Series::new(balance.get_date(), balance.get_amount())
+                Series::new(balance.get_date(), balance.get_amount_bc(&self.exchange_rate, self.base_currency.clone(), account.get_currency()))
             }).collect::<Vec<_>>();
             Line::new(account.get_name(), series)
         }).collect::<Vec<Line>>();
 
 
         LineChart::create("История по всем счетам", data)
-    }
-
-    fn total_sum_spaced(total_summ: u32) -> String {
-        let mut total_sum_str: Vec<char> = Vec::new();
-        for (i, char) in total_summ.to_string().chars().rev().enumerate() {
-            if i % 3 == 0 {
-                total_sum_str.push(' ');
-                total_sum_str.push(char);
-            } else {
-                total_sum_str.push(char);
-            }
-        }
-        total_sum_str.reverse();
-        total_sum_str.iter().collect()
     }
 }

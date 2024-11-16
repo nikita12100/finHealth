@@ -5,7 +5,7 @@ use image::{ImageBuffer, ImageFormat, Rgb};
 use plotters::backend::RGBPixel;
 use plotters::coord::types::RangedCoordu32;
 use teloxide::types::InputFile;
-use crate::charts::pie_chart::PieChart;
+use crate::utils::common::{generate_colors, total_sum_spaced};
 
 pub struct Series {
     pub time: DateTime<Utc>,
@@ -22,7 +22,7 @@ pub struct Line {
 }
 
 impl Line {
-    pub fn new(label: String, series: Vec<Series>) -> Line { Line{ label, series } }
+    pub fn new(label: String, series: Vec<Series>) -> Line { Line { label, series } }
     pub fn get_start_date(&self) -> DateTime<Utc> {
         self.series.iter().map(|x| x.time).min().unwrap()
     }
@@ -85,11 +85,16 @@ impl LineChart {
                 .build_cartesian_2d(x_left..x_right, y_bottom..y_top)
                 .unwrap();
 
-            ctx.configure_mesh().draw().unwrap();
+            ctx
+                .configure_mesh()
+                .x_label_formatter(&|v| format!("{}", v.format("%Y-%m-%d")))
+                .y_label_formatter(&|v| total_sum_spaced(*v))
+                .draw().unwrap();
 
-            let colors = PieChart::generate_colors(data_raw.len() as u8);
+            let colors = generate_colors(data_raw.len() as u8, Self::BASE_COLOR);
             for (i, line) in data_raw.iter().enumerate() {
-                let series = line.series.iter().map(|s| (s.time, s.value)).collect::<Vec<_>>();
+                let mut series = line.series.iter().map(|s| (s.time, s.value)).collect::<Vec<_>>();
+                Self::approximate_series(x_right, &mut series);
                 Self::append_series(&mut ctx, series, line.label.clone(), colors[i]);
             }
 
@@ -98,22 +103,42 @@ impl LineChart {
         bytes
     }
 
+    fn approximate_series(x_right: DateTime<Utc>, series: &mut Vec<(DateTime<Utc>, u32)>) {
+        if series.last().unwrap().0 < x_right {
+            series.push((x_right, series.last().unwrap().1));
+        }
+    }
+
     fn append_series<'a>(
         ctx: &mut ChartContext<'a, BitMapBackend<'a>, Cartesian2d<RangedDateTime<DateTime<Utc>>, RangedCoordu32>>,
         series: Vec<(DateTime<Utc>, u32)>,
         label_text: String,
         line_color: RGBColor,
     ) {
+        let style = ShapeStyle {
+            color: line_color.mix(0.9),
+            filled: true,
+            stroke_width: 3,
+        };
+        let style2 = ShapeStyle {
+            color: line_color.mix(0.9),
+            filled: true,
+            stroke_width: 10,
+        };
+
         ctx
-            .draw_series(LineSeries::new(series, line_color)).unwrap()
+            .draw_series(LineSeries::new(series, style).point_size(4)).unwrap()
             .label(label_text)
-            .legend(move |(x,y)| Rectangle::new([(x + 15, y + 1), (x, y)], line_color));
+            // .legend(move |(x, y)| Rectangle::new([(x + 15, y + 1), (x, y)], line_color));
+            .legend(move |(x, y)| PathElement::new([(x + 15, y - 1), (x, y)], style2));
+            // .legend(move |(x, y)| DottedPathElement::new([(x + 15, y + 1), (x, y)], line_color));
         ctx
             .configure_series_labels()
             .position(SeriesLabelPosition::LowerRight)
-            // .position(SeriesLabelPosition::Coordinate(1, 1))
-            // .margin(10)
-            // .legend_area_size(5)
+            // .background_style(style2)
+            // .position(SeriesLabelPosition::Coordinate(1, Self::HEIGHT as i32))
+            // .margin(100)
+            // .legend_area_size(50)
             .background_style(&WHITE.mix(0.8))
             .label_font(Self::LABELS_TEXT_STYLE)
             .border_style(&BLACK)

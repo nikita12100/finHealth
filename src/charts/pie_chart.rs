@@ -5,7 +5,7 @@ use plotters::prelude::*;
 use std::io::Cursor;
 use image::{ImageBuffer, ImageFormat, Rgb};
 use teloxide::types::InputFile;
-
+use crate::utils::common::generate_colors;
 
 pub struct PiePiece {
     pub size: f64,
@@ -46,7 +46,7 @@ impl PieChart {
             let title_style = TextStyle::from(("monospace", 50, "italic").into_font()).color(&(BLACK));
             root.titled(title_text, title_style).unwrap();
 
-            let pie_colors = Self::generate_colors(sizes.len() as u8);
+            let pie_colors = generate_colors(sizes.len() as u8, Self::BASE_COLOR);
             let dims = root.dim_in_pixel();
             let center = (dims.0 as i32 / 2, dims.1 as i32 / 2);
             let mut pie = Pie::new(&center, &Self::RADIUS, &sizes, &pie_colors, &labels);
@@ -68,22 +68,5 @@ impl PieChart {
             root.present().unwrap();
         }
         bytes
-    }
-
-    pub fn generate_colors(size: u8) -> Vec<RGBColor> {
-        let mut colors: Vec<RGBColor> = Vec::new();
-        colors.push(Self::BASE_COLOR);
-
-        let step = (255 / size).max(40);
-        for i in 1..size {
-            let next_color = RGBColor(
-                Self::BASE_COLOR.0.overflowing_add(i.overflowing_mul(step).0).0,
-                Self::BASE_COLOR.1.overflowing_sub(i.overflowing_mul(step).0).0,
-                Self::BASE_COLOR.2.overflowing_add(i.overflowing_mul(step.overflowing_mul(2).0).0).0,
-            );
-            colors.push(next_color);
-        }
-
-        colors
     }
 }
