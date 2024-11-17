@@ -43,7 +43,7 @@ pub async fn handler_update_balance_btn(bot: Bot, dialogue: MyDialogue, q: Callb
 
                     bot.send_message(chat_id, format!("Вы хотите изменить {:?}, выберете действие:", chosen_balance))
                         .reply_markup(make_keyboard(1, EditAccountButton::VALUES.to_vec())).await.unwrap();
-                    dialogue.update(State::GotListenBalanceNameListenAccountButtons(chosen_balance)).await?;
+                    dialogue.update(State::GotListenBalanceNameListenAccountButtonsCallback(chosen_balance)).await?;
                 }
             }
         }

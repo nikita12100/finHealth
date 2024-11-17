@@ -2,7 +2,7 @@ use std::str::FromStr;
 use teloxide::Bot;
 use teloxide::dispatching::dialogue::GetChatId;
 use teloxide::prelude::{CallbackQuery, Requester};
-use crate::{start_again, HandlerResult, MyDialogue};
+use crate::{goto_start, invalid_input_for_callback, HandlerResult, MyDialogue};
 use crate::db::db::DataBase;
 use crate::db::portfolio::Portfolio;
 use crate::enums::asset_location::AssetLocation;
@@ -34,9 +34,9 @@ pub async fn handler_location_btn(
         portfolio.get_account_mut(&*balance_name).unwrap().set_location(location);
         portfolio.save(chat_id)?;
 
-        start_again(bot, dialogue, chat_id).await?;
+        goto_start(bot, dialogue, chat_id).await?;
     } else {
-        panic!("Error parsing answer")
+        invalid_input_for_callback(bot, dialogue, q, format!("Необходимо выбрать одну из кнопок {:?}", ButtonLocation::get_locations())).await?;
     }
     Ok(())
 }

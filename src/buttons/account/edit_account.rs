@@ -2,7 +2,7 @@ use teloxide::Bot;
 use teloxide::dispatching::dialogue::GetChatId;
 use teloxide::payloads::SendMessageSetters;
 use teloxide::prelude::{CallbackQuery, Requester};
-use crate::{start_again, HandlerResult, MyDialogue, State};
+use crate::{goto_start, invalid_input_for_callback, HandlerResult, MyDialogue, State};
 use crate::buttons::account::set_location::ButtonLocation;
 use crate::buttons::account::set_type::ButtonType;
 use crate::buttons::set_currency::ButtonCurrency;
@@ -58,19 +58,19 @@ pub async fn handler_update_account_btn(bot: Bot, dialogue: MyDialogue, balance_
         EditAccountButton::SET_CURRENCY => {
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to SET_CURRENCY").await?;
 
-            dialogue.update(State::ListenCurrencyFor(balance_name)).await?;
+            dialogue.update(State::ListenCurrencyForCallback(balance_name)).await?;
             bot.send_message(chat_id, "Chose").reply_markup(make_keyboard_string(1, ButtonCurrency::get_currencies())).await?;
         }
         EditAccountButton::SET_LOCATION => {
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to SET_LOCATION").await?;
 
-            dialogue.update(State::ListenLocationFor(balance_name)).await?;
+            dialogue.update(State::ListenLocationForCallback(balance_name)).await?;
             bot.send_message(chat_id, "Chose").reply_markup(make_keyboard_string(1, ButtonLocation::get_locations())).await?;
         }
         EditAccountButton::SET_TYPE => {
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to SET_TYPE").await?;
 
-            dialogue.update(State::ListenTypeFor(balance_name)).await?;
+            dialogue.update(State::ListenTypeForCallback(balance_name)).await?;
             bot.send_message(chat_id, "Chose").reply_markup(make_keyboard_string(1, ButtonType::get_types())).await?;
         }
         EditAccountButton::REMOVE_BALANCE => {
@@ -81,9 +81,11 @@ pub async fn handler_update_account_btn(bot: Bot, dialogue: MyDialogue, balance_
             portfolio.delete_account(&account);
             portfolio.save(chat_id)?;
             bot.send_message(chat_id, format!("Баланс {} успешно удален", account.get_name())).await?;
-            start_again(bot, dialogue, chat_id).await?;
+            goto_start(bot, dialogue, chat_id).await?;
         }
-        _ => { panic!("Error parsing answer") }
+        _ => {
+            invalid_input_for_callback(bot, dialogue, q, format!("Необходимо выбрать одну из кнопок {:?}", EditAccountButton::VALUES.to_vec())).await?;
+        }
     }
     Ok(())
 }

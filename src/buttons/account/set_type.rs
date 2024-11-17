@@ -3,7 +3,7 @@ use teloxide::Bot;
 use teloxide::dispatching::dialogue::GetChatId;
 use teloxide::prelude::{CallbackQuery, Requester};
 use crate::enums::asset_type::AssetType;
-use crate::{start_again, HandlerResult, MyDialogue};
+use crate::{goto_start, invalid_input_for_callback, HandlerResult, MyDialogue};
 use crate::db::db::DataBase;
 use crate::db::portfolio::Portfolio;
 
@@ -35,9 +35,9 @@ pub async fn handler_type_btn(
         portfolio.get_account_mut(&*balance_name).unwrap().set_type(_type);
         portfolio.save(chat_id)?;
 
-        start_again(bot, dialogue, chat_id).await?;
+        goto_start(bot, dialogue, chat_id).await?;
     } else {
-        panic!("Error parsing answer")
+        invalid_input_for_callback(bot, dialogue, q, format!("Необходимо выбрать одну из кнопок {:?}", ButtonType::get_types())).await?;
     }
     Ok(())
 }

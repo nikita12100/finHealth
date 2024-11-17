@@ -82,9 +82,6 @@ const SELECT_BALANCE_SQL: &'static str = "SELECT id, amount, category, date FROM
 impl DataBase for Portfolio {
     fn create_tables() -> HandlerResult<()> {
         let conn = Connection::open(DB_NAME).unwrap();
-        conn.execute("DROP TABLE IF EXISTS portfolio", [])?; // todo remove
-        conn.execute("DROP TABLE IF EXISTS account", [])?;
-        conn.execute("DROP TABLE IF EXISTS balance", [])?;
         conn.execute(CREATE_PORTFOLIO_SQL, ()).unwrap();
         conn.execute(CREATE_ACCOUNT_SQL, ()).unwrap();
         conn.execute(CREATE_BALANCE_SQL, ()).unwrap();

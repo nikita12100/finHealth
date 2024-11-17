@@ -2,7 +2,7 @@ use teloxide::Bot;
 use teloxide::dispatching::dialogue::GetChatId;
 use teloxide::payloads::SendMessageSetters;
 use teloxide::prelude::{CallbackQuery, Requester};
-use crate::{HandlerResult, MyDialogue, State};
+use crate::{invalid_input_for_callback, HandlerResult, MyDialogue, State};
 use crate::buttons::set_currency::ButtonCurrency;
 use crate::utils::common::make_keyboard_string;
 
@@ -40,10 +40,12 @@ pub async fn handler_update_portfolio_btn(bot: Bot, dialogue: MyDialogue, q: Cal
         EditPortfolioButton::SET_EXCHANGE_RATE => {
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to SET_EXCHANGE_RATE").await?;
 
-            bot.send_message(chat_id, "todo").await?;
+            bot.send_message(chat_id, "not yet implemented").await?;
             // todo!() // авто получение курса + ручная установка
         }
-        _ => { panic!("Error parsing answer") }
+        _ => {
+            invalid_input_for_callback(bot, dialogue, q, format!("Необходимо выбрать одну из кнопок {:?}", EditPortfolioButton::VALUES.to_vec())).await?;
+        }
     }
     Ok(())
 }

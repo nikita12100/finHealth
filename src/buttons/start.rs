@@ -2,7 +2,7 @@ use teloxide::Bot;
 use teloxide::dispatching::dialogue::GetChatId;
 use teloxide::payloads::SendMessageSetters;
 use teloxide::prelude::{CallbackQuery, Requester};
-use crate::{make_keyboard, start_again, HandlerResult, MyDialogue, State};
+use crate::{goto_start, invalid_input_for_callback, make_keyboard, HandlerResult, MyDialogue, State};
 use crate::buttons::get_portfolio::GetPortfolioButtons;
 use crate::buttons::update_portfolio::UpdatePortfolioButton;
 use crate::db::portfolio::Portfolio;
@@ -39,17 +39,17 @@ pub async fn handler_start_btn(bot: Bot, dialogue: MyDialogue, q: CallbackQuery)
 
             bot.send_message(chat_id, "Выбере какой баланс вы хотите изменить?").reply_markup(make_keyboard(1, balances)).await?;
 
-            dialogue.update(State::ListenBalanceName).await?;
+            dialogue.update(State::ListenBalanceNameCallback).await?;
         }
         StartButton::HELP => {
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to HELP").await?;
+            // todo тут нежно сообщение
+            MockData::create().save(chat_id)?; // todo dev
 
-            MockData::create().save(chat_id)?;
-
-            start_again(bot, dialogue, chat_id).await?;
+            goto_start(bot, dialogue, chat_id).await?;
         }
         _ => {
-            panic!("Error parsing answer")
+            invalid_input_for_callback(bot, dialogue, q, format!("Необходимо выбрать одну из кнопок {:?}", StartButton::VALUES.to_vec())).await?;
         }
     }
     Ok(())

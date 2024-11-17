@@ -2,10 +2,22 @@ use std::str::FromStr;
 use teloxide::Bot;
 use teloxide::dispatching::dialogue::GetChatId;
 use teloxide::prelude::{CallbackQuery, Requester};
-use crate::{start_again, HandlerResult, MyDialogue};
+use crate::{goto_start, invalid_input_for_callback, HandlerResult, MyDialogue};
 use crate::db::db::DataBase;
 use crate::db::portfolio::Portfolio;
 use crate::enums::category::Category;
+
+pub struct ButtonCategory {}
+
+impl ButtonCategory {
+    pub fn get_categories() -> Vec<String> {
+        let mut result: Vec<String> = vec![];
+        for c in Category::iterator() {
+            result.push(c.to_string());
+        }
+        result
+    }
+}
 
 pub async fn handler_category_btn(
     bot: Bot,
@@ -24,9 +36,9 @@ pub async fn handler_category_btn(
         portfolio.get_account_mut(&*balance_name).unwrap().add_balance_outcome(outcome, category);
         portfolio.save(chat_id)?;
 
-        start_again(bot, dialogue, chat_id).await?;
+        goto_start(bot, dialogue, chat_id).await?;
     } else {
-        panic!("Error parsing answer")
+        invalid_input_for_callback(bot, dialogue, q, format!("Необходимо выбрать одну из кнопок {:?}", ButtonCategory::get_categories())).await?;
     }
     Ok(())
 }
