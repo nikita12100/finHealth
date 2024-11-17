@@ -21,7 +21,7 @@ impl ButtonLocation {
 pub async fn handler_location_btn(
     bot: Bot,
     dialogue: MyDialogue,
-    balance_name: String,
+    account_name: String,
     q: CallbackQuery,
 ) -> HandlerResult {
     bot.answer_callback_query(&q.id).await?;
@@ -31,10 +31,10 @@ pub async fn handler_location_btn(
         let location: AssetLocation = AssetLocation::from_str(data.as_str()).unwrap();
         let mut portfolio = Portfolio::get(chat_id.0).unwrap_or(Portfolio::empty());
 
-        portfolio.get_account_mut(&*balance_name).unwrap().set_location(location);
+        portfolio.get_account_mut(&*account_name).unwrap().set_location(location);
         portfolio.save(chat_id)?;
 
-        goto_start(bot, dialogue, chat_id).await?;
+        goto_start(bot, dialogue, chat_id, None).await?;
     } else {
         invalid_input_for_callback(bot, dialogue, q, format!("Необходимо выбрать одну из кнопок {:?}", ButtonLocation::get_locations())).await?;
     }

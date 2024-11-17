@@ -166,6 +166,6 @@ impl DataBase for Portfolio {
             ))
         }).unwrap();
 
-        Option::from(portfolios.next().unwrap().unwrap())
+        portfolios.next().map(|c| c.ok()).flatten()
     }
 }

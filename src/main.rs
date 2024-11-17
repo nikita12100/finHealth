@@ -44,21 +44,21 @@ pub enum State { // todo replace in enums
     ListenEditPortfolioButtonsCallback,
     ListenSetBaseCurrencyButtonsCallback,
     ListenCategoryCallback {
-        balance_name: String,
+        account_name: String,
         outcome: u32,
     },
     // Listen client data from chat
     ListenBalanceNameCallback,
-    ListenNewBalanceName,
-    ListenBalanceAmountFor(String),
-    ListenBalanceIncomeFor(String),
-    ListenBalanceOutcomeFor(String),
+    ListenNewAccountName,
+    ListenAccountAmountFor(String),
+    ListenAccountIncomeFor(String),
+    ListenAccountOutcomeFor(String),
     ListenCurrencyForCallback(String),
     ListenLocationForCallback(String),
     ListenTypeForCallback(String),
     // Get client data from chat for each listen
-    GotListenBalanceNameListenAccountButtonsCallback(String),
-    GotNewBalanceName(String),
+    GotListenAccountNameListenAccountButtonsCallback(String),
+    GotNewAccountName(String),
 }
 
 #[derive(Clone, Debug, BotCommands)]
@@ -87,12 +87,12 @@ async fn main() {
             Update::filter_message()
                 .enter_dialogue::<Message, ErasedStorage<State>, State>()
                 .branch(dptree::case![State::Start].filter_command::<Command>().endpoint(start))
-                .branch(dptree::case![State::ListenNewBalanceName].endpoint(listen_new_balance_name))
-                .branch(dptree::case![State::GotNewBalanceName(new_balance_name)].endpoint(listen_new_balance_amount))
-                .branch(dptree::case![State::ListenBalanceAmountFor(balance_name)].endpoint(listen_balance_new_amount))
-                .branch(dptree::case![State::ListenBalanceIncomeFor(balance_name)].endpoint(listen_balance_income_amount))
-                .branch(dptree::case![State::ListenBalanceOutcomeFor(balance_name)].endpoint(listen_balance_outcome_amount))
-                .branch(dptree::endpoint(invalid_input_must_callback_default))
+                .branch(dptree::case![State::ListenNewAccountName].endpoint(listen_new_account_name))
+                .branch(dptree::case![State::GotNewAccountName(new_account_name)].endpoint(listen_new_account_amount))
+                .branch(dptree::case![State::ListenAccountAmountFor(account_name)].endpoint(listen_account_new_amount))
+                .branch(dptree::case![State::ListenAccountIncomeFor(account_name)].endpoint(listen_account_income_amount))
+                .branch(dptree::case![State::ListenAccountOutcomeFor(account_name)].endpoint(listen_account_outcome_amount))
+                .branch(dptree::endpoint(|b, d, m: Message| goto_start(b, d, m.chat.id, Some(INVALID_COMMAND_TEXT.to_string()))))
         )
         .branch(
             Update::filter_callback_query()
@@ -100,13 +100,13 @@ async fn main() {
                 .branch(dptree::case![State::ListenStartButtonsCallback].endpoint(handler_start_btn))
                 .branch(dptree::case![State::ListenGetPortfolioButtonsCallback].endpoint(handler_get_portfolio_btn))
                 .branch(dptree::case![State::ListenEditPortfolioButtonsCallback].endpoint(handler_update_portfolio_btn))
-                .branch(dptree::case![State::ListenCurrencyForCallback(balance_name)].endpoint(handler_set_currency_btn))
-                .branch(dptree::case![State::ListenLocationForCallback(balance_name)].endpoint(handler_location_btn))
-                .branch(dptree::case![State::ListenTypeForCallback(balance_name)].endpoint(handler_type_btn))
+                .branch(dptree::case![State::ListenCurrencyForCallback(account_name)].endpoint(handler_set_currency_btn))
+                .branch(dptree::case![State::ListenLocationForCallback(account_name)].endpoint(handler_location_btn))
+                .branch(dptree::case![State::ListenTypeForCallback(account_name)].endpoint(handler_type_btn))
                 .branch(dptree::case![State::ListenSetBaseCurrencyButtonsCallback].endpoint(handler_set_base_currency_btn))
-                .branch(dptree::case![State::ListenCategoryCallback{balance_name, outcome}].endpoint(handler_category_btn))
+                .branch(dptree::case![State::ListenCategoryCallback{account_name, outcome}].endpoint(handler_category_btn))
                 .branch(dptree::case![State::ListenBalanceNameCallback].endpoint(handler_update_balance_btn))
-                .branch(dptree::case![State::GotListenBalanceNameListenAccountButtonsCallback(balance_name)].endpoint(handler_update_account_btn))
+                .branch(dptree::case![State::GotListenAccountNameListenAccountButtonsCallback(account_name)].endpoint(handler_update_account_btn))
                 .endpoint(|b, d, q| invalid_input_for_callback(b, d, q, UNKNOWN_ERROR.to_string())),
         );
 
@@ -127,9 +127,12 @@ async fn start(bot: Bot, dialogue: MyDialogue, msg: Message) -> HandlerResult {
     Ok(())
 }
 
-async fn goto_start(bot: Bot, dialogue: MyDialogue, chat_id: ChatId) -> HandlerResult {
-    let intro_text = "Выберите действие:";
+async fn goto_start(bot: Bot, dialogue: MyDialogue, chat_id: ChatId, error_text: Option<String>) -> HandlerResult {
+    if let Some(text) = error_text {
+        bot.send_message(chat_id, text).await?;
+    }
 
+    let intro_text = "Выберите действие:";
     dialogue.update(State::ListenStartButtonsCallback).await?;
     bot.send_message(chat_id, intro_text).reply_markup(make_keyboard(1, StartButton::VALUES.to_vec())).await?;
 
@@ -137,18 +140,8 @@ async fn goto_start(bot: Bot, dialogue: MyDialogue, chat_id: ChatId) -> HandlerR
 }
 
 async fn invalid_input_for_callback(bot: Bot, dialogue: MyDialogue, q: CallbackQuery, text: String) -> HandlerResult {
-    let chat_id = q.chat_id().unwrap();
-
     bot.answer_callback_query(&q.id).await?;
-    bot.send_message(chat_id, text).await?;
-    goto_start(bot, dialogue, chat_id).await?;
+    goto_start(bot, dialogue, q.chat_id().unwrap(), Some(text)).await?;
 
-    Ok(())
-}
-
-async fn invalid_input_must_callback_default(bot: Bot, dialogue: MyDialogue, msg: Message) -> HandlerResult {
-    bot.send_message(msg.chat.id, INVALID_COMMAND_TEXT).await?;
-    dialogue.update(State::Start).await?;
-    start(bot, dialogue, msg).await?;
     Ok(())
 }

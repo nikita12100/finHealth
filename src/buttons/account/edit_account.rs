@@ -32,7 +32,7 @@ impl EditAccountButton {
     ];
 }
 
-pub async fn handler_update_account_btn(bot: Bot, dialogue: MyDialogue, balance_name: String, q: CallbackQuery) -> HandlerResult {
+pub async fn handler_update_account_btn(bot: Bot, dialogue: MyDialogue, account_name: String, q: CallbackQuery) -> HandlerResult {
     bot.answer_callback_query(&q.id).await?;
     let chat_id = q.chat_id().unwrap();
 
@@ -40,48 +40,48 @@ pub async fn handler_update_account_btn(bot: Bot, dialogue: MyDialogue, balance_
 
     match q.data.clone().unwrap().as_str() {
         EditAccountButton::SET_BALANCE => {
-            let current_balance = portfolio.get_account(&*balance_name).unwrap().get_last_amount().unwrap();
+            let current_balance = portfolio.get_account(&*account_name).unwrap().get_last_amount().unwrap();
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), format!("Текущее значение {}, укажите новое значение баланса:", current_balance)).await?;
 
-            dialogue.update(State::ListenBalanceAmountFor(balance_name)).await?;
+            dialogue.update(State::ListenAccountAmountFor(account_name)).await?;
         }
         EditAccountButton::INCOME_AMOUNT => {
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "введите доход:").await?;
 
-            dialogue.update(State::ListenBalanceIncomeFor(balance_name)).await?;
+            dialogue.update(State::ListenAccountIncomeFor(account_name)).await?;
         }
         EditAccountButton::OUTCOME_AMOUNT => {
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "введите расход:").await?;
 
-            dialogue.update(State::ListenBalanceOutcomeFor(balance_name)).await?;
+            dialogue.update(State::ListenAccountOutcomeFor(account_name)).await?;
         }
         EditAccountButton::SET_CURRENCY => {
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to SET_CURRENCY").await?;
 
-            dialogue.update(State::ListenCurrencyForCallback(balance_name)).await?;
+            dialogue.update(State::ListenCurrencyForCallback(account_name)).await?;
             bot.send_message(chat_id, "Chose").reply_markup(make_keyboard_string(1, ButtonCurrency::get_currencies())).await?;
         }
         EditAccountButton::SET_LOCATION => {
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to SET_LOCATION").await?;
 
-            dialogue.update(State::ListenLocationForCallback(balance_name)).await?;
+            dialogue.update(State::ListenLocationForCallback(account_name)).await?;
             bot.send_message(chat_id, "Chose").reply_markup(make_keyboard_string(1, ButtonLocation::get_locations())).await?;
         }
         EditAccountButton::SET_TYPE => {
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to SET_TYPE").await?;
 
-            dialogue.update(State::ListenTypeForCallback(balance_name)).await?;
+            dialogue.update(State::ListenTypeForCallback(account_name)).await?;
             bot.send_message(chat_id, "Chose").reply_markup(make_keyboard_string(1, ButtonType::get_types())).await?;
         }
         EditAccountButton::REMOVE_BALANCE => {
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to REMOVE_BALANCE").await?;
-            let account = portfolio.get_account(&*balance_name).unwrap();
+            let account = portfolio.get_account(&*account_name).unwrap();
 
 
             portfolio.delete_account(&account);
             portfolio.save(chat_id)?;
             bot.send_message(chat_id, format!("Баланс {} успешно удален", account.get_name())).await?;
-            goto_start(bot, dialogue, chat_id).await?;
+            goto_start(bot, dialogue, chat_id, None).await?;
         }
         _ => {
             invalid_input_for_callback(bot, dialogue, q, format!("Необходимо выбрать одну из кнопок {:?}", EditAccountButton::VALUES.to_vec())).await?;

@@ -22,7 +22,7 @@ impl ButtonCategory {
 pub async fn handler_category_btn(
     bot: Bot,
     dialogue: MyDialogue,
-    (balance_name, outcome): (String, u32),
+    (account_name, outcome): (String, u32),
     q: CallbackQuery,
 ) -> HandlerResult {
     bot.answer_callback_query(&q.id).await?;
@@ -33,10 +33,10 @@ pub async fn handler_category_btn(
         let category: Category = Category::from_str(&category_string).unwrap();
         let mut portfolio = Portfolio::get(chat_id.0).unwrap_or(Portfolio::empty());
 
-        portfolio.get_account_mut(&*balance_name).unwrap().add_balance_outcome(outcome, category);
+        portfolio.get_account_mut(&*account_name).unwrap().add_balance_outcome(outcome, category);
         portfolio.save(chat_id)?;
 
-        goto_start(bot, dialogue, chat_id).await?;
+        goto_start(bot, dialogue, chat_id, None).await?;
     } else {
         invalid_input_for_callback(bot, dialogue, q, format!("Необходимо выбрать одну из кнопок {:?}", ButtonCategory::get_categories())).await?;
     }

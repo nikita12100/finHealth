@@ -34,7 +34,7 @@ pub async fn handler_update_balance_btn(bot: Bot, dialogue: MyDialogue, q: Callb
             match portfolio_opt {
                 None => {
                     bot.send_message(chat_id, "У вас еще нет баланса, введите имя для нового баланса:").await?;
-                    dialogue.update(State::ListenNewBalanceName).await?;
+                    dialogue.update(State::ListenNewAccountName).await?;
                 }
                 Some(portfolio) => {
                     let balances = portfolio.get_account_names();
@@ -43,7 +43,7 @@ pub async fn handler_update_balance_btn(bot: Bot, dialogue: MyDialogue, q: Callb
 
                     bot.send_message(chat_id, format!("Вы хотите изменить {:?}, выберете действие:", chosen_balance))
                         .reply_markup(make_keyboard(1, EditAccountButton::VALUES.to_vec())).await.unwrap();
-                    dialogue.update(State::GotListenBalanceNameListenAccountButtonsCallback(chosen_balance)).await?;
+                    dialogue.update(State::GotListenAccountNameListenAccountButtonsCallback(chosen_balance)).await?;
                 }
             }
         }

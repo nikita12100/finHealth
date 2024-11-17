@@ -46,7 +46,7 @@ pub async fn handler_start_btn(bot: Bot, dialogue: MyDialogue, q: CallbackQuery)
             // todo тут нежно сообщение
             MockData::create().save(chat_id)?; // todo dev
 
-            goto_start(bot, dialogue, chat_id).await?;
+            goto_start(bot, dialogue, chat_id, None).await?;
         }
         _ => {
             invalid_input_for_callback(bot, dialogue, q, format!("Необходимо выбрать одну из кнопок {:?}", StartButton::VALUES.to_vec())).await?;

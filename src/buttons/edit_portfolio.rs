@@ -29,7 +29,7 @@ pub async fn handler_update_portfolio_btn(bot: Bot, dialogue: MyDialogue, q: Cal
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to ADD_BALANCE").await?;
 
             bot.send_message(chat_id, "Напишите как будет называться баланс:").await?;
-            dialogue.update(State::ListenNewBalanceName).await?;
+            dialogue.update(State::ListenNewAccountName).await?;
         }
         EditPortfolioButton::SET_BASE_CURRENCY => {
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to SET_BASE_CURRENCY").await?;

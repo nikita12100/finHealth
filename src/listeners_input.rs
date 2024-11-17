@@ -11,7 +11,7 @@ use crate::enums::asset_type::AssetType;
 use crate::enums::currency::Currency;
 use crate::utils::common::make_keyboard_string;
 
-pub async fn listen_new_balance_name(
+pub async fn listen_new_account_name(
     bot: Bot,
     dialogue: MyDialogue,
     msg: Message,
@@ -19,89 +19,103 @@ pub async fn listen_new_balance_name(
     match msg.text() {
         Some(name) => {
             bot.send_message(msg.chat.id, format!("name will be {:#?}, write please amount:", name)).await?;
-            dialogue.update(State::GotNewBalanceName(name.to_string())).await?;
-            Ok(())
+            dialogue.update(State::GotNewAccountName(name.to_string())).await?;
         }
-        None => { panic!("Error parsing answer") }
+        None => {
+            let text = "Неправильное имя счета";
+            goto_start(bot, dialogue, msg.chat.id, Some(text.to_string())).await?;
+        }
     }
+    Ok(())
 }
 
 
-pub async fn listen_new_balance_amount(
+pub async fn listen_new_account_amount(
     bot: Bot,
     dialogue: MyDialogue,
-    balance_name: String,
+    account_name: String,
     msg: Message,
 ) -> HandlerResult {
     match msg.text().unwrap().parse::<u32>() {
         Ok(amount) => {
-            let balance = Account::new(balance_name, amount, Currency::Rub, AssetLocation::Other, AssetType::default());
+            let account = Account::new(account_name, amount, Currency::Rub, AssetLocation::Other, AssetType::default());
             let mut portfolio = Portfolio::get(msg.chat.id.0).unwrap_or(Portfolio::empty());
 
-            portfolio.add_account(balance);
+            portfolio.add_account(account);
             portfolio.save(msg.chat.id)?;
 
             bot.send_message(msg.chat.id, format!("portfolio saved {:#?}", portfolio)).await?;
-            goto_start(bot, dialogue, msg.chat.id).await?;
-
-            Ok(())
+            goto_start(bot, dialogue, msg.chat.id, None).await?;
         }
-        Err(_) => { panic!("Error parsing answer") }
+        Err(_) => {
+            let text = "Неправильное значение баланса";
+            goto_start(bot, dialogue, msg.chat.id, Some(text.to_string())).await?;
+        }
     }
+    Ok(())
 }
-pub async fn listen_balance_new_amount(
+pub async fn listen_account_new_amount(
     bot: Bot,
     dialogue: MyDialogue,
-    balance_name: String,
+    account_name: String,
     msg: Message,
 ) -> HandlerResult {
     match msg.text().unwrap().parse::<u32>() {
         Ok(new_balance) => {
             let mut portfolio = Portfolio::get(msg.chat.id.0).unwrap_or(Portfolio::empty());
 
-            portfolio.get_account_mut(&*balance_name).unwrap().set_balance_amount(new_balance, None);
+            portfolio.get_account_mut(&*account_name).unwrap().set_balance_amount(new_balance, None);
             portfolio.save(msg.chat.id)?;
             bot.send_message(msg.chat.id, format!("portfolio updated {:#?}", portfolio)).await?;
-            goto_start(bot, dialogue, msg.chat.id).await?;
+            goto_start(bot, dialogue, msg.chat.id, None).await?;
         }
-        Err(_) => { panic!("Error parsing answer") }
+        Err(_) => {
+            let text = "Неправильное значение баланса";
+            goto_start(bot, dialogue, msg.chat.id, Some(text.to_string())).await?;
+        }
     }
     Ok(())
 }
 
-pub async fn listen_balance_income_amount(
+pub async fn listen_account_income_amount(
     bot: Bot,
     dialogue: MyDialogue,
-    balance_name: String,
+    account_name: String,
     msg: Message,
 ) -> HandlerResult {
     match msg.text().unwrap().parse::<u32>() {
         Ok(income) => {
             let mut portfolio = Portfolio::get(msg.chat.id.0).unwrap_or(Portfolio::empty());
 
-            portfolio.get_account_mut(&*balance_name).unwrap().add_balance_income(income);
+            portfolio.get_account_mut(&*account_name).unwrap().add_balance_income(income);
             portfolio.save(msg.chat.id)?;
             bot.send_message(msg.chat.id, format!("portfolio updated {:#?}", portfolio)).await?;
-            goto_start(bot, dialogue, msg.chat.id).await?;
+            goto_start(bot, dialogue, msg.chat.id, None).await?;
         }
-        Err(_) => { panic!("Error parsing answer") }
+        Err(_) => {
+            let text = "Неправильное значение баланса";
+            goto_start(bot, dialogue, msg.chat.id, Some(text.to_string())).await?;
+        }
     }
     Ok(())
 }
 
-pub async fn listen_balance_outcome_amount(
+pub async fn listen_account_outcome_amount(
     bot: Bot,
     dialogue: MyDialogue,
-    balance_name: String,
+    account_name: String,
     msg: Message,
 ) -> HandlerResult {
     match msg.text().unwrap().parse::<u32>() {
         Ok(outcome) => {
-            dialogue.update(State::ListenCategoryCallback { balance_name, outcome }).await?;
+            dialogue.update(State::ListenCategoryCallback { account_name: account_name, outcome }).await?;
 
             bot.send_message(msg.chat.id, "Выберите категорию трат:").reply_markup(make_keyboard_string(3, ButtonCategory::get_categories())).await?;
         }
-        Err(_) => { panic!("Error parsing answer") }
+        Err(_) => {
+            let text = "Неправильное значение баланса";
+            goto_start(bot, dialogue, msg.chat.id, Some(text.to_string())).await?;
+        }
     }
     Ok(())
 }
