@@ -5,6 +5,7 @@ use crate::db::balance_timed::BalanceTimed;
 use crate::db::portfolio::Portfolio;
 use crate::enums::asset_location::AssetLocation;
 use crate::enums::asset_type::AssetType;
+use crate::enums::category::Category;
 use crate::enums::currency::Currency;
 use crate::utils::exchange_rate::Convert;
 
@@ -40,6 +41,9 @@ impl Account {
             balance,
         }
     }
+    pub fn append_balance_db(&mut self, balances: Vec<BalanceTimed>) {
+        self.balance = balances;
+    }
     pub fn new(name: String, start_balance: u32, currency: Currency, asset_location: AssetLocation, asset_type: AssetType) -> Self {
         Account {
             id: Uuid::new_v4(),
@@ -51,11 +55,11 @@ impl Account {
         }
     }
 
-    pub fn get_id(&self) -> Uuid { self.id }
-    pub fn set_balance_amount(&mut self, new_amount: u32, category: Option<String>) {
+    pub fn get_id(&self) -> String { self.id.to_string() }
+    pub fn set_balance_amount(&mut self, new_amount: u32, category: Option<Category>) {
         self.balance.push(BalanceTimed::new_category(new_amount, category));
     }
-    fn set_balance_amount_date(&mut self, new_amount: u32, category: Option<String>, date: DateTime<Utc>) {
+    fn set_balance_amount_date(&mut self, new_amount: u32, category: Option<Category>, date: DateTime<Utc>) {
         self.balance.push(BalanceTimed::new_date_category(new_amount, date, category));
     }
     pub fn add_balance_income(&mut self, income: u32) {
@@ -66,11 +70,11 @@ impl Account {
         let new_amount = self.balance.last().unwrap().get_amount() + income;
         self.set_balance_amount_date(new_amount, None, date);
     }
-    pub fn add_balance_outcome(&mut self, outcome: u32, category: String) {
+    pub fn add_balance_outcome(&mut self, outcome: u32, category: Category) {
         let new_amount = self.balance.last().unwrap().get_amount() - outcome;
         self.set_balance_amount(new_amount, Some(category));
     }
-    pub fn add_balance_outcome_date(&mut self, outcome: u32, category: String, date: DateTime<Utc>) {
+    pub fn add_balance_outcome_date(&mut self, outcome: u32, category: Category, date: DateTime<Utc>) {
         let new_amount = self.balance.last().unwrap().get_amount() - outcome;
         self.set_balance_amount_date(new_amount, Some(category), date);
     }

@@ -36,17 +36,17 @@ impl MockData {
         p.get_account_mut("TMON").unwrap().add_balance_income_date(5000, Utc.with_ymd_and_hms(2024, 11, 3, 21, 1, 55).unwrap());
         p.get_account_mut("TPAY").unwrap().add_balance_income_date(100500, Utc.with_ymd_and_hms(2024, 11, 3, 21, 1, 55).unwrap());
         p.get_account_mut("металл").unwrap().add_balance_income_date(15000, Utc.with_ymd_and_hms(2024, 11, 3, 21, 1, 55).unwrap());
-        p.get_account_mut("вклад").unwrap().add_balance_outcome_date(15000, Category::Other.to_string(), Utc.with_ymd_and_hms(2024, 11, 3, 21, 1, 55).unwrap());
+        p.get_account_mut("вклад").unwrap().add_balance_outcome_date(15000, Category::Other, Utc.with_ymd_and_hms(2024, 11, 3, 21, 1, 55).unwrap());
 
-        p.get_account_mut("daily").unwrap().add_balance_outcome_date(10000, Category::Taxi.to_string(), Utc.with_ymd_and_hms(2024, 11, 2, 22, 1, 55).unwrap());
-        p.get_account_mut("daily").unwrap().add_balance_outcome_date(5000, Category::Products.to_string(), Utc.with_ymd_and_hms(2024, 11, 3, 21, 15, 55).unwrap());
-        p.get_account_mut("daily").unwrap().add_balance_outcome_date(30000, Category::ApartmentRent.to_string(), Utc.with_ymd_and_hms(2024, 11, 5, 23, 1, 55).unwrap());
-        p.get_account_mut("daily").unwrap().add_balance_outcome_date(5000, Category::ApartmentRent.to_string(), Utc.with_ymd_and_hms(2024, 11, 6, 21, 1, 55).unwrap());
-        p.get_account_mut("daily").unwrap().add_balance_outcome_date(4000, Category::CafesAndRestaurants.to_string(), Utc.with_ymd_and_hms(2024, 11, 8, 21, 19, 55).unwrap());
-        p.get_account_mut("daily").unwrap().add_balance_outcome_date(20000, Category::Pets.to_string(), Utc.with_ymd_and_hms(2024, 11, 10, 22, 1, 55).unwrap());
+        p.get_account_mut("daily").unwrap().add_balance_outcome_date(10000, Category::Taxi, Utc.with_ymd_and_hms(2024, 11, 2, 22, 1, 55).unwrap());
+        p.get_account_mut("daily").unwrap().add_balance_outcome_date(5000, Category::Products, Utc.with_ymd_and_hms(2024, 11, 3, 21, 15, 55).unwrap());
+        p.get_account_mut("daily").unwrap().add_balance_outcome_date(30000, Category::ApartmentRent, Utc.with_ymd_and_hms(2024, 11, 5, 23, 1, 55).unwrap());
+        p.get_account_mut("daily").unwrap().add_balance_outcome_date(5000, Category::ApartmentRent, Utc.with_ymd_and_hms(2024, 11, 6, 21, 1, 55).unwrap());
+        p.get_account_mut("daily").unwrap().add_balance_outcome_date(4000, Category::CafesAndRestaurants, Utc.with_ymd_and_hms(2024, 11, 8, 21, 19, 55).unwrap());
+        p.get_account_mut("daily").unwrap().add_balance_outcome_date(20000, Category::Pets, Utc.with_ymd_and_hms(2024, 11, 10, 22, 1, 55).unwrap());
         p.get_account_mut("daily").unwrap().add_balance_income_date(40000, Utc.with_ymd_and_hms(2024, 11, 11, 12, 1, 55).unwrap());
-        p.get_account_mut("daily").unwrap().add_balance_outcome_date(5000, Category::ApartmentRent.to_string(), Utc.with_ymd_and_hms(2024, 11, 11, 15, 1, 55).unwrap());
-        p.get_account_mut("daily").unwrap().add_balance_outcome_date(30000, Category::Products.to_string(), Utc.with_ymd_and_hms(2024, 11, 11, 20, 1, 55).unwrap());
+        p.get_account_mut("daily").unwrap().add_balance_outcome_date(5000, Category::ApartmentRent, Utc.with_ymd_and_hms(2024, 11, 11, 15, 1, 55).unwrap());
+        p.get_account_mut("daily").unwrap().add_balance_outcome_date(30000, Category::Products, Utc.with_ymd_and_hms(2024, 11, 11, 20, 1, 55).unwrap());
 
         p
     }

@@ -39,7 +39,9 @@ pub async fn handler_update_portfolio_btn(bot: Bot, dialogue: MyDialogue, q: Cal
         }
         EditPortfolioButton::SET_EXCHANGE_RATE => {
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to SET_EXCHANGE_RATE").await?;
-            todo!() // авто получение курса + ручная установка
+
+            bot.send_message(chat_id, "todo").await?;
+            // todo!() // авто получение курса + ручная установка
         }
         _ => { panic!("Error parsing answer") }
     }

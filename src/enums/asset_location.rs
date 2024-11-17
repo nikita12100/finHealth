@@ -3,8 +3,7 @@ use std::str::FromStr;
 use strum_macros::Display;
 use crate::enums::asset_location::AssetLocation::*;
 
-#[derive(Clone, Debug, Display, Default, serde_repr::Serialize_repr, serde_repr::Deserialize_repr, PartialEq)]
-#[repr(u8)]
+#[derive(Clone, Debug, Display, Default, PartialEq)]
 pub enum AssetLocation {
     #[default]
     #[strum(to_string = "Other")]
@@ -53,6 +52,24 @@ impl FromStr for AssetLocation {
             "Bank2" => Ok(Bank2),
             "Bank3" => Ok(Bank3),
             "PocketMoney" => Ok(PocketMoney),
+            _ => Err(()),
+        }
+    }
+}
+
+impl TryFrom<i32> for AssetLocation {
+    type Error = ();
+
+    fn try_from(v: i32) -> Result<Self, Self::Error> {
+        match v {
+            x if x == Other as i32 => Ok(Other),
+            x if x == Broker1 as i32 => Ok(Broker1),
+            x if x == Broker2 as i32 => Ok(Broker2),
+            x if x == Broker3 as i32 => Ok(Broker3),
+            x if x == Bank1 as i32 => Ok(Bank1),
+            x if x == Bank2 as i32 => Ok(Bank2),
+            x if x == Bank3 as i32 => Ok(Bank3),
+            x if x == PocketMoney as i32 => Ok(PocketMoney),
             _ => Err(()),
         }
     }

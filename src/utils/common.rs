@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use plotters::style::RGBColor;
 use teloxide::types::{InlineKeyboardButton, InlineKeyboardMarkup};
 
@@ -50,4 +51,12 @@ pub fn make_keyboard(row_size: usize, buttons: Vec<&str>) -> InlineKeyboardMarku
     }
 
     InlineKeyboardMarkup::new(keyboard)
+}
+
+pub fn date_to_str(date: DateTime<Utc>) -> String {
+    date.to_rfc3339()
+}
+
+pub fn str_to_date(date: String) -> DateTime<Utc> {
+    DateTime::parse_from_rfc3339(&date).unwrap().with_timezone(&Utc)
 }

@@ -3,8 +3,7 @@ use std::str::FromStr;
 use strum_macros::Display;
 use crate::enums::currency::Currency::*;
 
-#[derive(Clone, Debug, Display, Default, serde_repr::Serialize_repr, serde_repr::Deserialize_repr, PartialEq)]
-#[repr(u8)]
+#[derive(Clone, Debug, Display, Default, PartialEq)]
 pub enum Currency {
     #[default]
     #[strum(to_string = "RUB")]
@@ -29,6 +28,18 @@ impl FromStr for Currency {
             "rub" => Ok(Rub),
             "usd" => Ok(Usd),
             "eur" => Ok(Eur),
+            _ => Err(()),
+        }
+    }
+}
+impl TryFrom<i32> for Currency {
+    type Error = ();
+
+    fn try_from(v: i32) -> Result<Self, Self::Error> {
+        match v {
+            x if x == Rub as i32 => Ok(Rub),
+            x if x == Usd as i32 => Ok(Usd),
+            x if x == Eur as i32 => Ok(Eur),
             _ => Err(()),
         }
     }

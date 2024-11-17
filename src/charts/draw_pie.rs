@@ -4,6 +4,7 @@ use itertools::Itertools;
 use teloxide::types::InputFile;
 use crate::charts::pie_chart::{PieChart, PiePiece};
 use crate::db::portfolio::Portfolio;
+use crate::enums::category::Category;
 use crate::utils::common::total_sum_spaced;
 
 pub trait DrawPie {
@@ -37,7 +38,7 @@ impl DrawPie for Portfolio {
             let spend = balance_prev.get_amount() as i32 - balance.get_amount() as i32;
             if spend > 0 && balance.get_date() > week_threshold {
                 distribution_spends
-                    .entry(balance.get_category().unwrap_or("unknown".to_string()))
+                    .entry(balance.get_category().map(|c| c.to_string()).unwrap_or(Category::default().to_string()))
                     .and_modify(|sum| *sum += spend as u32)
                     .or_insert(spend as u32);
             }

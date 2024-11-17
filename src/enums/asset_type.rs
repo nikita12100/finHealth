@@ -3,8 +3,7 @@ use std::str::FromStr;
 use strum_macros::Display;
 use crate::enums::asset_type::AssetType::*;
 
-#[derive(Clone, Debug, Display, Default, serde_repr::Serialize_repr, serde_repr::Deserialize_repr, PartialEq)]
-#[repr(u8)]
+#[derive(Clone, Debug, Display, Default, PartialEq)]
 pub enum AssetType {
     #[default]
     #[strum(to_string = "cash")]
@@ -53,6 +52,24 @@ impl FromStr for AssetType {
             "share" => Ok(Share),
             "bond" => Ok(Bond),
             "bondCurrency" => Ok(BondCurrency),
+            _ => Err(()),
+        }
+    }
+}
+
+impl TryFrom<i32> for AssetType {
+    type Error = ();
+
+    fn try_from(v: i32) -> Result<Self, Self::Error> {
+        match v {
+            x if x == Cash as i32 => Ok(Cash),
+            x if x == Crypto as i32 => Ok(Crypto),
+            x if x == Repo as i32 => Ok(Repo),
+            x if x == Gold as i32 => Ok(Gold),
+            x if x == Deposit as i32 => Ok(Deposit),
+            x if x == Share as i32 => Ok(Share),
+            x if x == Bond as i32 => Ok(Bond),
+            x if x == BondCurrency as i32 => Ok(BondCurrency),
             _ => Err(()),
         }
     }
