@@ -10,7 +10,7 @@ pub struct EditPortfolioButton;
 
 impl EditPortfolioButton {
     pub const ADD_BALANCE: &'static str = "Добавить новый баланс";
-    pub const SET_BASE_CURRENCY: &'static str = "Установить основную валюту";
+    pub const SET_BASE_CURRENCY: &'static str = "Установить валюту портфеля";
     pub const SET_EXCHANGE_RATE: &'static str = "Установить курсы валют";
 
     pub const VALUES: &'static [&'static str; 3] = &[
@@ -26,9 +26,9 @@ pub async fn handler_update_portfolio_btn(bot: Bot, dialogue: MyDialogue, q: Cal
 
     match q.data.clone().unwrap().as_str() {
         EditPortfolioButton::ADD_BALANCE => {
-            bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to ADD_BALANCE").await?;
+            bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "Давайте добавим новый счет").await?;
 
-            bot.send_message(chat_id, "Напишите как будет называться баланс:").await?;
+            bot.send_message(chat_id, "Напишите как будет новый называться счет:").await?;
             dialogue.update(State::ListenNewAccountName).await?;
         }
         EditPortfolioButton::SET_BASE_CURRENCY => {

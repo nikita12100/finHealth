@@ -118,9 +118,17 @@ async fn main() {
         .await;
 }
 
-async fn start(bot: Bot, dialogue: MyDialogue, msg: Message) -> HandlerResult {
-    let intro_text = "Привет, я умею ...\nВыберите действие:";
+fn init_portfolio(chat_id: ChatId) -> HandlerResult {
+    if Portfolio::get(chat_id.0).is_none() {
+        Portfolio::empty().save(chat_id)?;
+    };
+    Ok(())
+}
 
+async fn start(bot: Bot, dialogue: MyDialogue, msg: Message) -> HandlerResult {
+    init_portfolio(msg.chat.id)?;
+
+    let intro_text = "Привет, я умею ...\nВыберите действие:";
     dialogue.update(State::ListenStartButtonsCallback).await?;
     bot.send_message(msg.chat.id, intro_text).reply_markup(make_keyboard(1, StartButton::VALUES.to_vec())).await?;
 

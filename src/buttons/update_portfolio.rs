@@ -24,27 +24,23 @@ pub async fn handler_update_balance_btn(bot: Bot, dialogue: MyDialogue, q: Callb
 
     match q.data.clone().unwrap().as_str() {
         UpdatePortfolioButton::EDIT_BALANCES => {
-            bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to EDIT_BALANCES").await?;
+            bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "Как вы хотите изменить портфель?").await?;
 
             dialogue.update(State::ListenEditPortfolioButtonsCallback).await?;
-            bot.send_message(chat_id, "Chose").reply_markup(make_keyboard(1, EditPortfolioButton::VALUES.to_vec())).await?;
+            bot.send_message(chat_id, "Выберите что изменить:").reply_markup(make_keyboard(1, EditPortfolioButton::VALUES.to_vec())).await?;
         }
         _ => {
-            let portfolio_opt = Portfolio::get(q.chat_id().unwrap().0);
-            match portfolio_opt {
-                None => {
-                    bot.send_message(chat_id, "У вас еще нет баланса, введите имя для нового баланса:").await?;
-                    dialogue.update(State::ListenNewAccountName).await?;
-                }
-                Some(portfolio) => {
-                    let balances = portfolio.get_account_names();
-                    let chosen_balance = q.data.unwrap();
-                    assert!(balances.contains(&chosen_balance));
+            if let Some(portfolio) = Portfolio::get(q.chat_id().unwrap().0) {
+                let balances = portfolio.get_account_names();
+                let chosen_balance = q.data.unwrap();
+                assert!(balances.contains(&chosen_balance));
 
-                    bot.send_message(chat_id, format!("Вы хотите изменить {:?}, выберете действие:", chosen_balance))
-                        .reply_markup(make_keyboard(1, EditAccountButton::VALUES.to_vec())).await.unwrap();
-                    dialogue.update(State::GotListenAccountNameListenAccountButtonsCallback(chosen_balance)).await?;
-                }
+                bot.send_message(chat_id, format!("Вы хотите изменить {:?}, выберете действие:", chosen_balance))
+                    .reply_markup(make_keyboard(1, EditAccountButton::VALUES.to_vec())).await.unwrap();
+                dialogue.update(State::GotListenAccountNameListenAccountButtonsCallback(chosen_balance)).await?;
+            } else {
+                bot.send_message(chat_id, "У вас еще нет баланса, введите имя для нового баланса:").await?;
+                dialogue.update(State::ListenNewAccountName).await?;
             }
         }
     }

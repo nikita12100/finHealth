@@ -2,7 +2,7 @@ use std::str::FromStr;
 use teloxide::Bot;
 use teloxide::dispatching::dialogue::GetChatId;
 use teloxide::prelude::{CallbackQuery, Requester};
-use crate::{goto_start, invalid_input_for_callback, HandlerResult, MyDialogue};
+use crate::{goto_start, init_portfolio, invalid_input_for_callback, HandlerResult, MyDialogue};
 use crate::db::db::DataBase;
 use crate::db::portfolio::Portfolio;
 use crate::enums::category::Category;
@@ -31,12 +31,17 @@ pub async fn handler_category_btn(
     if let Some(ref data) = q.data {
         let category_string :String = data.as_str().chars().filter(|c| c.is_alphabetic() || c.is_whitespace()).collect::<String>().trim().to_string();
         let category: Category = Category::from_str(&category_string).unwrap();
-        let mut portfolio = Portfolio::get(chat_id.0).unwrap_or(Portfolio::empty());
+        if let Some(mut portfolio) = Portfolio::get(q.chat_id().unwrap().0) {
+            portfolio.get_account_mut(&*account_name).unwrap().add_balance_outcome(outcome, category);
+            portfolio.save(chat_id)?;
 
-        portfolio.get_account_mut(&*account_name).unwrap().add_balance_outcome(outcome, category);
-        portfolio.save(chat_id)?;
-
-        goto_start(bot, dialogue, chat_id, None).await?;
+            goto_start(bot, dialogue, chat_id, None).await?;
+        } else {
+        log::error!("Portfolio not found for {}", chat_id);
+        init_portfolio(chat_id)?;
+        let error = "Простите, произошла ошибка :(\nCode 1\nПовторите операцию";
+        goto_start(bot, dialogue, chat_id, Some(error.to_string())).await?;
+        }
     } else {
         invalid_input_for_callback(bot, dialogue, q, format!("Необходимо выбрать одну из кнопок {:?}", ButtonCategory::get_categories())).await?;
     }
