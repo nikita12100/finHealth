@@ -63,7 +63,7 @@ pub async fn handler_get_portfolio_btn(bot: Bot, dialogue: MyDialogue, q: Callba
                 goto_start(bot, dialogue, chat_id, None).await?;
             }
             GetPortfolioButtons::DRAW_WEEK_SPENDS => {
-                let pie_chart = portfolio.draw_pie_spends("daily".to_string(), 7);
+                let pie_chart = portfolio.draw_pie_spends("daily".to_string(), 7); // todo remove daily
 
                 bot.send_photo(chat_id, pie_chart).await?;
                 goto_start(bot, dialogue, chat_id, None).await?;

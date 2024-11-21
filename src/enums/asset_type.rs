@@ -1,26 +1,27 @@
 use std::slice::Iter;
 use std::str::FromStr;
-use strum_macros::Display;
+use strum_macros::{Display, EnumString, IntoStaticStr};
 use crate::enums::asset_type::AssetType::*;
 
-#[derive(Clone, Debug, Display, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Display, EnumString, IntoStaticStr)]
 pub enum AssetType {
     #[default]
-    #[strum(to_string = "cash")]
+    #[strum(serialize = "cash")]
     Cash = 0,
-    #[strum(to_string = "crypto")]
+    #[strum(serialize = "crypto")]
     Crypto = 1,
-    #[strum(to_string = "repo")]
+    #[strum(serialize = "repo")]
     Repo = 2,
-    #[strum(to_string = "gold")]
+    #[strum(serialize = "gold")]
     Gold = 3,
-    #[strum(to_string = "deposit")]
+    #[strum(serialize = "deposit")]
     Deposit = 4,
-    #[strum(to_string = "share")]
+    #[strum(serialize = "share")]
     Share = 5,
-    #[strum(to_string = "bond")]
+    #[strum(serialize = "bond")]
     Bond = 6,
-    #[strum(to_string = "bond$")]
+    #[strum(serialize = "bond$")]
     BondCurrency = 7,
 }
 
@@ -37,23 +38,6 @@ impl AssetType {
             BondCurrency,
         ];
         VALUES.iter()
-    }
-}
-
-impl FromStr for AssetType {
-    type Err = ();
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "cash" => Ok(Cash),
-            "crypto" => Ok(Crypto),
-            "repo" => Ok(Repo),
-            "gold" => Ok(Gold),
-            "deposit" => Ok(Deposit),
-            "share" => Ok(Share),
-            "bond" => Ok(Bond),
-            "bondCurrency" => Ok(BondCurrency),
-            _ => Err(()),
-        }
     }
 }
 

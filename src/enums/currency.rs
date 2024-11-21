@@ -1,16 +1,17 @@
 use std::slice::Iter;
 use std::str::FromStr;
-use strum_macros::Display;
+use strum_macros::{Display, EnumString, IntoStaticStr};
 use crate::enums::currency::Currency::*;
 
-#[derive(Clone, Debug, Display, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Display, EnumString, IntoStaticStr)]
 pub enum Currency {
     #[default]
-    #[strum(to_string = "RUB")]
+    #[strum(serialize = "RUB")]
     Rub = 0,
-    #[strum(to_string = "USD")]
+    #[strum(serialize = "USD")]
     Usd = 1,
-    #[strum(to_string = "EUR")]
+    #[strum(serialize = "EUR")]
     Eur = 2,
 }
 
@@ -21,17 +22,6 @@ impl Currency {
     }
 }
 
-impl FromStr for Currency {
-    type Err = ();
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_lowercase().as_str() {
-            "rub" => Ok(Rub),
-            "usd" => Ok(Usd),
-            "eur" => Ok(Eur),
-            _ => Err(()),
-        }
-    }
-}
 impl TryFrom<i32> for Currency {
     type Error = ();
 

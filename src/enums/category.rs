@@ -1,44 +1,45 @@
 use std::slice::Iter;
 use std::str::FromStr;
-use strum_macros::Display;
+use strum_macros::{Display, EnumString, IntoStaticStr};
 use crate::enums::category::Category::*;
 
-#[derive(Clone, Debug, Display, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Display, EnumString, IntoStaticStr)]
 pub enum Category {
     #[default]
-    #[strum(to_string = "❓ Другое")]
+    #[strum(serialize = "❓ Другое")]
     Other = 0,
-    #[strum(to_string = "🏢 Аренда кв")]
+    #[strum(serialize = "🏢 Аренда кв")]
     ApartmentRent = 1,
-    #[strum(to_string = "🍽 Кафе и рестораны")]
+    #[strum(serialize = "🍽 Кафе и рестораны")]
     CafesAndRestaurants = 2,
-    #[strum(to_string = "🚗 Машина")]
+    #[strum(serialize = "🚗 Машина")]
     Car = 3,
-    #[strum(to_string = "👕 Одежда")]
+    #[strum(serialize = "👕 Одежда")]
     Cloth = 4,
-    #[strum(to_string = "📚 Образование")]
+    #[strum(serialize = "📚 Образование")]
     Education = 5,
-    #[strum(to_string = "🎭 Развлечения")]
+    #[strum(serialize = "🎭 Развлечения")]
     Entertainment = 6,
-    #[strum(to_string = "🍔 Фастфуд")]
+    #[strum(serialize = "🍔 Фастфуд")]
     FastFood = 7,
-    #[strum(to_string = "🎁 Подарки")]
+    #[strum(serialize = "🎁 Подарки")]
     Gifts = 8,
-    #[strum(to_string = "🛒 Продукты")]
+    #[strum(serialize = "🛒 Продукты")]
     Products = 9,
-    #[strum(to_string = "👤 Личное")]
+    #[strum(serialize = "👤 Личное")]
     Personal = 10,
-    #[strum(to_string = "🐶 Животные")]
+    #[strum(serialize = "🐶 Животные")]
     Pets = 11,
-    #[strum(to_string = "🚕 Такси")]
+    #[strum(serialize = "🚕 Такси")]
     Taxi = 12,
-    #[strum(to_string = "🚌 Транспорт")]
+    #[strum(serialize = "🚌 Транспорт")]
     Transport = 13,
-    #[strum(to_string = "✈️ Путешествия")]
+    #[strum(serialize = "✈️ Путешествия")]
     Trips = 14,
-    #[strum(to_string = "💊 Здоровье")]
+    #[strum(serialize = "💊 Здоровье")]
     Health = 15,
-    #[strum(to_string = "🏠 Дом")]
+    #[strum(serialize = "🏠 Дом")]
     House = 16,
 }
 
@@ -64,32 +65,6 @@ impl Category {
             House,
         ];
         VALUES.iter()
-    }
-}
-
-impl FromStr for Category {
-    type Err = ();
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_lowercase().as_str() {
-            "ApartmentRent" => Ok(ApartmentRent),
-            "CafesAndRestaurants" => Ok(CafesAndRestaurants),
-            "Car" => Ok(Car),
-            "Cloth" => Ok(Cloth),
-            "Education" => Ok(Education),
-            "Entertainment" => Ok(Entertainment),
-            "FastFood" => Ok(FastFood),
-            "Gifts" => Ok(Gifts),
-            "Products" => Ok(Products),
-            "Personal" => Ok(Personal),
-            "Pets" => Ok(Pets),
-            "Taxi" => Ok(Taxi),
-            "Transport" => Ok(Transport),
-            "Trips" => Ok(Trips),
-            "Health" => Ok(Health),
-            "House" => Ok(House),
-            "Other" => Ok(Other),
-            _ => Err(()),
-        }
     }
 }
 

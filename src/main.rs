@@ -50,7 +50,6 @@ pub enum State { // todo replace in enums
     // Listen client data from chat
     ListenBalanceNameCallback,
     ListenNewAccountName,
-    ListenAccountAmountFor(String),
     ListenAccountIncomeFor(String),
     ListenAccountOutcomeFor(String),
     ListenCurrencyForCallback(String),
@@ -89,7 +88,6 @@ async fn main() {
                 .branch(dptree::case![State::Start].filter_command::<Command>().endpoint(start))
                 .branch(dptree::case![State::ListenNewAccountName].endpoint(listen_new_account_name))
                 .branch(dptree::case![State::GotNewAccountName(new_account_name)].endpoint(listen_new_account_amount))
-                .branch(dptree::case![State::ListenAccountAmountFor(account_name)].endpoint(listen_account_new_amount))
                 .branch(dptree::case![State::ListenAccountIncomeFor(account_name)].endpoint(listen_account_income_amount))
                 .branch(dptree::case![State::ListenAccountOutcomeFor(account_name)].endpoint(listen_account_outcome_amount))
                 .branch(dptree::endpoint(|b, d, m: Message| goto_start(b, d, m.chat.id, Some(INVALID_COMMAND_TEXT.to_string()))))

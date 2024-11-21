@@ -40,40 +40,12 @@ pub async fn listen_new_account_amount(
 
     match msg.text().unwrap().parse::<u32>() {
         Ok(amount) => {
-            let account = Account::new(account_name, amount, Currency::Rub, AssetLocation::Other, AssetType::default());
+            let account = Account::new(account_name.clone(), amount, Currency::Rub, AssetLocation::Other, AssetType::default());
             if let Some(mut portfolio) = Portfolio::get(chat_id.0) {
                 portfolio.add_account(account);
                 portfolio.save(chat_id)?;
 
-                bot.send_message(chat_id, "portfolio saved").await?;
-                goto_start(bot, dialogue, chat_id, None).await?;
-            } else {
-                log::error!("Portfolio not found for {}", chat_id);
-                init_portfolio(chat_id)?;
-                let error = "Простите, произошла ошибка :(\nCode 1\nПовторите операцию";
-                goto_start(bot, dialogue, chat_id, Some(error.to_string())).await?;
-            }
-        }
-        Err(_) => {
-            let text = "Неправильное значение баланса";
-            goto_start(bot, dialogue, chat_id, Some(text.to_string())).await?;
-        }
-    }
-    Ok(())
-}
-pub async fn listen_account_new_amount(
-    bot: Bot,
-    dialogue: MyDialogue,
-    account_name: String,
-    msg: Message,
-) -> HandlerResult {
-    let chat_id = msg.chat.id;
-    match msg.text().unwrap().parse::<u32>() {
-        Ok(new_balance) => {
-            if let Some(mut portfolio) = Portfolio::get(chat_id.0) {
-                portfolio.get_account_mut(&*account_name).unwrap().set_balance_amount(new_balance, None);
-                portfolio.save(chat_id)?;
-                bot.send_message(chat_id, format!("portfolio updated {:#?}", portfolio)).await?;
+                bot.send_message(chat_id, format!("Счет \"{}\" успешно добавлен", &account_name)).await?;
                 goto_start(bot, dialogue, chat_id, None).await?;
             } else {
                 log::error!("Portfolio not found for {}", chat_id);
@@ -103,7 +75,9 @@ pub async fn listen_account_income_amount(
             if let Some(mut portfolio) = Portfolio::get(chat_id.0) {
                 portfolio.get_account_mut(&*account_name).unwrap().add_balance_income(income);
                 portfolio.save(chat_id)?;
-                bot.send_message(chat_id, format!("portfolio updated {:#?}", portfolio)).await?;
+                let account = portfolio.get_account(&*account_name).unwrap();
+                let last_amount = account.get_last_amount().unwrap();
+                bot.send_message(chat_id, format!("Счет \"{}\" успешно обновлен, текущий баланс {}", account_name, last_amount)).await?;
                 goto_start(bot, dialogue, chat_id, None).await?;
             } else {
                 log::error!("Portfolio not found for {}", chat_id);

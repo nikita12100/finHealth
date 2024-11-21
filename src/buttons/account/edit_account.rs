@@ -13,7 +13,6 @@ use crate::utils::common::make_keyboard_string;
 pub struct EditAccountButton;
 
 impl EditAccountButton {
-    pub const SET_BALANCE: &'static str = "✍️ Установить баланс";
     pub const INCOME_AMOUNT: &'static str = "📈 Внести доход";
     pub const OUTCOME_AMOUNT: &'static str = "📉 Внести расход";
     pub const SET_CURRENCY: &'static str = "Изменить валюту счета";
@@ -21,8 +20,7 @@ impl EditAccountButton {
     pub const SET_TYPE: &'static str = "Изменить тип счета";
     pub const REMOVE_BALANCE: &'static str = "Удалить этот баланс";
 
-    pub const VALUES: &'static [&'static str; 7] = &[
-        Self::SET_BALANCE,
+    pub const VALUES: &'static [&'static str; 6] = &[
         Self::INCOME_AMOUNT,
         Self::OUTCOME_AMOUNT,
         Self::SET_CURRENCY,
@@ -38,12 +36,6 @@ pub async fn handler_update_account_btn(bot: Bot, dialogue: MyDialogue, account_
 
     if let Some(mut portfolio) = Portfolio::get(q.chat_id().unwrap().0) {
         match q.data.clone().unwrap().as_str() {
-            EditAccountButton::SET_BALANCE => {
-                let current_balance = portfolio.get_account(&*account_name).unwrap().get_last_amount().unwrap();
-                bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), format!("Текущее значение {}, укажите новое значение баланса:", current_balance)).await?;
-
-                dialogue.update(State::ListenAccountAmountFor(account_name)).await?;
-            }
             EditAccountButton::INCOME_AMOUNT => {
                 bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "введите доход:").await?;
 

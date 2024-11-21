@@ -56,7 +56,7 @@ impl Account {
     }
 
     pub fn get_id(&self) -> String { self.id.to_string() }
-    pub fn set_balance_amount(&mut self, new_amount: u32, category: Option<Category>) {
+    fn set_balance_amount(&mut self, new_amount: u32, category: Option<Category>) {
         self.balance.push(BalanceTimed::new_category(new_amount, category));
     }
     fn set_balance_amount_date(&mut self, new_amount: u32, category: Option<Category>, date: DateTime<Utc>) {
