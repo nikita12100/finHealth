@@ -1,11 +1,8 @@
 use rusqlite::{named_params, Connection};
 use teloxide::types::ChatId;
 use crate::db::account::Account;
-use crate::db::balance_timed::BalanceTimed;
 use crate::db::database::query::*;
-use crate::db::portfolio::Portfolio;
-use crate::utils::common::{date_to_str, str_to_date};
-use crate::utils::exchange_rate::ExchangeRate;
+use crate::utils::common::date_to_str;
 
 type HandlerResult<T> = rusqlite::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
@@ -45,7 +42,7 @@ impl DataBaseAccount for Account {
     }
 
     fn delete(&self) -> HandlerResult<()> {
-        let mut conn = Connection::open(DB_NAME).unwrap();
+        let conn = Connection::open(DB_NAME).unwrap();
 
         let mut stmt_delete_account = conn.prepare(DELETE_ACCOUNT_SQL).unwrap();
         stmt_delete_account.execute([self.get_id()]).unwrap();

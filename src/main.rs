@@ -83,15 +83,20 @@ async fn main() {
         .await;
 }
 
-fn init_portfolio(chat_id: ChatId) -> HandlerResult {
-    if Portfolio::get(chat_id.0).is_none() {
-        Portfolio::empty().save(chat_id)?;
-    };
-    Ok(())
+fn get_or_create_portfolio(chat_id: ChatId) -> Portfolio {
+    if let Some(portfolio) = Portfolio::get(chat_id.0) {
+        log::info!("Fetched portfolio for {}", chat_id);
+        portfolio
+    } else {
+        log::info!("Portfolio not found for {}, trying to create", chat_id);
+        let portfolio = Portfolio::empty();
+        portfolio.save(chat_id).unwrap();
+        portfolio
+    }
 }
 
 async fn start(bot: Bot, dialogue: MyDialogue, msg: Message) -> HandlerResult {
-    init_portfolio(msg.chat.id)?;
+    get_or_create_portfolio(msg.chat.id);
 
     let intro_text = "Привет, я умею ...\nВыберите действие:";
     dialogue.update(State::ListenStartButtonsCallback).await?;

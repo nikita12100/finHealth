@@ -2,10 +2,8 @@ use std::str::FromStr;
 use teloxide::Bot;
 use teloxide::dispatching::dialogue::GetChatId;
 use teloxide::prelude::{CallbackQuery, Requester};
-use crate::{goto_start, init_portfolio, invalid_input_for_callback, HandlerResult, MyDialogue};
+use crate::{get_or_create_portfolio, goto_start, invalid_input_for_callback, HandlerResult, MyDialogue};
 use crate::db::database::db_account::DataBaseAccount;
-use crate::db::database::db_portfolio::DataBasePortfolio;
-use crate::db::portfolio::Portfolio;
 use crate::enums::asset_location::AssetLocation;
 
 pub struct ButtonLocation {}
@@ -30,20 +28,15 @@ pub async fn handler_location_btn(
 
     if let Some(ref data) = q.data {
         let location: AssetLocation = AssetLocation::from_str(data.as_str()).unwrap();
-        if let Some(mut portfolio) = Portfolio::get(q.chat_id().unwrap().0) {
-            let account  = portfolio.get_account_mut(&*account_name).unwrap();
-            account.set_location(location.clone());
-            account.save(chat_id)?;
+        let mut portfolio = get_or_create_portfolio(chat_id);
 
-            bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), format!("Локация успешно обновлена на {}", location)).await?;
+        let account = portfolio.get_account_mut(&*account_name).unwrap();
+        account.set_location(location.clone());
+        account.save(chat_id)?;
 
-            goto_start(bot, dialogue, chat_id, None).await?;
-        } else {
-            log::error!("Portfolio not found for {}", chat_id);
-            init_portfolio(chat_id)?;
-            let error = "Простите, произошла ошибка :(\nCode 1\nПовторите операцию";
-            goto_start(bot, dialogue, chat_id, Some(error.to_string())).await?;
-        }
+        bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), format!("Локация успешно обновлена на {}", location)).await?;
+
+        goto_start(bot, dialogue, chat_id, None).await?;
     } else {
         invalid_input_for_callback(bot, dialogue, q, format!("Необходимо выбрать одну из кнопок {:?}", ButtonLocation::get_locations())).await?;
     }

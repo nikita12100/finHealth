@@ -2,7 +2,7 @@ use teloxide::Bot;
 use teloxide::dispatching::dialogue::GetChatId;
 use teloxide::payloads::SendMessageSetters;
 use teloxide::prelude::{CallbackQuery, Requester};
-use crate::{goto_start, init_portfolio, invalid_input_for_callback, make_keyboard, HandlerResult, MyDialogue, State};
+use crate::{get_or_create_portfolio, goto_start, invalid_input_for_callback, make_keyboard, HandlerResult, MyDialogue, State};
 use crate::buttons::get_portfolio::GetPortfolioButtons;
 use crate::buttons::update_portfolio::UpdatePortfolioButton;
 use crate::db::database::db_portfolio::DataBasePortfolio;
@@ -42,7 +42,7 @@ pub async fn handler_start_btn(bot: Bot, dialogue: MyDialogue, q: CallbackQuery)
                 bot.send_message(chat_id, "Выберите какой баланс вы хотите изменить:").reply_markup(make_keyboard_string(1, accounts)).await?;
                 dialogue.update(State::ListenBalanceNameCallback).await?;
             } else {
-                init_portfolio(chat_id)?;
+                get_or_create_portfolio(chat_id);
                 bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "У вас нет баланса, давайте добавим первый").await?;
                 bot.send_message(chat_id, "Напишите как будет новый называться счет:").await?;
                 dialogue.update(State::ListenNewAccountName).await?;

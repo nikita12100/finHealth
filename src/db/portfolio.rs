@@ -31,9 +31,6 @@ impl Portfolio {
     pub fn add_account(&mut self, account: Account) {
         self.accounts.push(account);
     }
-    pub fn delete_account(&mut self, account: &Account) {
-        self.accounts.retain(|x| !x.eq(account))
-    }
     pub fn get_account(&self, name: &str) -> Option<Account> {
         self.accounts.iter().find(|account| account.get_name() == name).cloned()
     }
