@@ -79,7 +79,6 @@ impl Account {
         self.set_balance_amount_date(new_amount, Some(category), date);
     }
     pub fn get_name(&self) -> String { self.name.clone() }
-    pub fn get_name_str(&self) -> &str { &self.name }
 
     pub fn get_currency(&self) -> &Currency { &self.currency }
     pub fn set_currency(&mut self, c: Currency) { self.currency = c }

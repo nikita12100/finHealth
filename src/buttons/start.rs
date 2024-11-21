@@ -5,8 +5,8 @@ use teloxide::prelude::{CallbackQuery, Requester};
 use crate::{goto_start, init_portfolio, invalid_input_for_callback, make_keyboard, HandlerResult, MyDialogue, State};
 use crate::buttons::get_portfolio::GetPortfolioButtons;
 use crate::buttons::update_portfolio::UpdatePortfolioButton;
+use crate::db::database::db_portfolio::DataBasePortfolio;
 use crate::db::portfolio::Portfolio;
-use crate::db::db::DataBase;
 use crate::utils::common::make_keyboard_string;
 use crate::utils::mock_data::MockData;
 
@@ -29,7 +29,7 @@ pub async fn handler_start_btn(bot: Bot, dialogue: MyDialogue, q: CallbackQuery)
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "Выберите счет для редактирования").await?;
 
             dialogue.update(State::ListenGetPortfolioButtonsCallback).await?;
-            bot.send_message(chat_id, "Chose").reply_markup(make_keyboard(1, GetPortfolioButtons::VALUES.to_vec())).await?;
+            bot.send_message(chat_id, "Выберите статистику").reply_markup(make_keyboard(1, GetPortfolioButtons::VALUES.to_vec())).await?;
         }
         StartButton::UPDATE_PORTFOLIO => {
             let portfolio_opt = Portfolio::get(chat_id.0);

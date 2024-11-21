@@ -4,7 +4,7 @@ use teloxide::prelude::{Message, Requester};
 use crate::{goto_start, init_portfolio, HandlerResult, MyDialogue, State};
 use crate::buttons::account::set_category::ButtonCategory;
 use crate::db::account::Account;
-use crate::db::db::DataBase;
+use crate::db::database::db_portfolio::DataBasePortfolio;
 use crate::db::portfolio::Portfolio;
 use crate::enums::asset_location::AssetLocation;
 use crate::enums::asset_type::AssetType;

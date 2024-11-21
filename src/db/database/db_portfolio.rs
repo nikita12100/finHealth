@@ -2,93 +2,20 @@ use rusqlite::{named_params, Connection};
 use teloxide::types::ChatId;
 use crate::db::account::Account;
 use crate::db::balance_timed::BalanceTimed;
+use crate::db::database::query::*;
 use crate::db::portfolio::Portfolio;
 use crate::utils::common::{date_to_str, str_to_date};
 use crate::utils::exchange_rate::ExchangeRate;
 
 type HandlerResult<T> = rusqlite::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
-pub trait DataBase {
-    fn create_tables() -> HandlerResult<()>;
+pub trait DataBasePortfolio {
     fn save(&self, id: ChatId) -> HandlerResult<()>;
     fn save_id(&self, id: i64) -> HandlerResult<()>;
     fn get(id: i64) -> Option<Portfolio>;
 }
 
-const DB_NAME: &'static str = "portfolios.db";
-
-// ========================================== <TABLES> ==========================================
-const CREATE_PORTFOLIO_SQL: &'static str =
-    "CREATE TABLE IF NOT EXISTS portfolio (
-        id             INTEGER PRIMARY KEY,
-        base_currency  INTEGER NOT NULL DEFAULT 0,
-        exchange_rate  TEXT
-    )";
-
-const CREATE_ACCOUNT_SQL: &'static str =
-    "CREATE TABLE IF NOT EXISTS account (
-        id              TEXT PRIMARY KEY,
-        chat_id         INTEGER NOT NULL,
-        name            TEXT,
-        currency        INTEGER NOT NULL DEFAULT 0,
-        asset_location  INTEGER NOT NULL DEFAULT 0,
-        asset_type      INTEGER NOT NULL DEFAULT 0,
-        balance         TEXT
-    )";
-
-const CREATE_BALANCE_SQL: &'static str =
-    "CREATE TABLE IF NOT EXISTS balance (
-        id              TEXT PRIMARY KEY,
-        account_id      TEXT NOT NULL,
-        amount          INTEGER NOT NULL,
-        category        INTEGER NOT NULL DEFAULT -1,
-        date            TEXT NOT NULL
-    )";
-
-// ========================================== >TABLES< ==========================================
-
-const INSERT_PORTFOLIO_SQL: &'static str =
-    "INSERT INTO portfolio (id, base_currency, exchange_rate)
-     VALUES (:id, :base_currency, :exchange_rate) ON CONFLICT (id) DO UPDATE SET
-     base_currency=EXCLUDED.base_currency,
-     exchange_rate=EXCLUDED.exchange_rate
-     ";
-
-const INSERT_ACCOUNT_SQL: &'static str =
-    "INSERT INTO account (id, chat_id, name, currency, asset_location, asset_type, balance)
-     VALUES (:id, :chat_id, :name, :currency, :asset_location, :asset_type, :balance) ON CONFLICT (id) DO UPDATE SET
-     chat_id=EXCLUDED.chat_id,
-     name=EXCLUDED.name,
-     currency=EXCLUDED.currency,
-     asset_location=EXCLUDED.asset_location,
-     asset_type=EXCLUDED.asset_type,
-     balance=EXCLUDED.balance
-     ";
-
-const INSERT_BALANCE_SQL: &'static str =
-    "INSERT INTO balance (id, account_id, amount, category, date)
-     VALUES (:id, :account_id, :amount, :category, :date) ON CONFLICT (id) DO UPDATE SET
-     account_id=EXCLUDED.account_id,
-     amount=EXCLUDED.amount,
-     category=EXCLUDED.category,
-     date=EXCLUDED.date
-     ";
-
-const SELECT_PORTFOLIO_SQL: &'static str = "SELECT base_currency, exchange_rate FROM portfolio WHERE id = :id";
-const SELECT_ACCOUNT_SQL: &'static str = "SELECT id, name, currency, asset_location, asset_type, balance FROM account where chat_id = :chat_id";
-const SELECT_BALANCE_SQL: &'static str = "SELECT id, amount, category, date FROM balance where account_id = :account_id";
-
-
-impl DataBase for Portfolio {
-    fn create_tables() -> HandlerResult<()> {
-        let conn = Connection::open(DB_NAME).unwrap();
-        conn.execute(CREATE_PORTFOLIO_SQL, ()).unwrap();
-        conn.execute(CREATE_ACCOUNT_SQL, ()).unwrap();
-        conn.execute(CREATE_BALANCE_SQL, ()).unwrap();
-
-        Ok(())
-    }
-
+impl DataBasePortfolio for Portfolio {
     fn save(&self, id: ChatId) -> HandlerResult<()> { Self::save_id(self, id.0) }
     fn save_id(&self, id: i64) -> HandlerResult<()> {
         let mut conn = Connection::open(DB_NAME).unwrap();
@@ -108,7 +35,6 @@ impl DataBase for Portfolio {
                 ":currency": account.get_currency().clone() as i32,
                 ":asset_location": account.get_location() as i32,
                 ":asset_type": account.get_type() as i32,
-                ":balance": "none",
                 })?;
 
             for balance in account.get_balances() {

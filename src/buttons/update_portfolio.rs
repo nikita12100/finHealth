@@ -5,8 +5,8 @@ use teloxide::prelude::{CallbackQuery, Requester};
 use crate::{make_keyboard, HandlerResult, MyDialogue, State};
 use crate::buttons::account::edit_account::EditAccountButton;
 use crate::buttons::edit_portfolio::EditPortfolioButton;
+use crate::db::database::db_portfolio::DataBasePortfolio;
 use crate::db::portfolio::Portfolio;
-use crate::db::db::DataBase;
 
 pub struct UpdatePortfolioButton;
 
@@ -35,8 +35,10 @@ pub async fn handler_update_balance_btn(bot: Bot, dialogue: MyDialogue, q: Callb
                 let chosen_balance = q.data.unwrap();
                 assert!(balances.contains(&chosen_balance));
 
-                bot.send_message(chat_id, format!("Вы хотите изменить {:?}, выберете действие:", chosen_balance))
+                bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), format!("Редактирование счета {}", chosen_balance)).await?;
+                bot.send_message(chat_id, "Выберете действие:")
                     .reply_markup(make_keyboard(1, EditAccountButton::VALUES.to_vec())).await.unwrap();
+
                 dialogue.update(State::GotListenAccountNameListenAccountButtonsCallback(chosen_balance)).await?;
             } else {
                 bot.send_message(chat_id, "У вас еще нет баланса, введите имя для нового баланса:").await?;

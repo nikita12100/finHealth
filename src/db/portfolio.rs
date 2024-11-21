@@ -28,9 +28,6 @@ impl Portfolio {
     pub fn get_account_names(&self) -> Vec<String> {
         self.accounts.iter().map(|account| account.get_name().clone()).collect()
     }
-    pub fn get_account_names_str(&self) -> Vec<&str> {
-        self.accounts.iter().map(|account| account.get_name_str()).collect()
-    }
     pub fn add_account(&mut self, account: Account) {
         self.accounts.push(account);
     }

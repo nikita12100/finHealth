@@ -12,7 +12,6 @@ use teloxide::{
         GetChatId,
     },
     prelude::*,
-    utils::command::BotCommands,
 };
 use rusqlite::Result;
 use crate::buttons::account::edit_account::handler_update_account_btn;
@@ -24,8 +23,11 @@ use crate::buttons::get_portfolio::handler_get_portfolio_btn;
 use crate::buttons::set_currency::{handler_set_base_currency_btn, handler_set_currency_btn};
 use crate::buttons::start::{handler_start_btn, StartButton};
 use crate::buttons::update_portfolio::handler_update_balance_btn;
-use crate::db::db::DataBase;
+use crate::db::database::db_portfolio::DataBasePortfolio;
+use crate::db::database::db_tables::DataBaseTables;
 use crate::db::portfolio::Portfolio;
+use crate::enums::command::Command;
+use crate::enums::state::State;
 use crate::listeners_input::*;
 use crate::utils::common::make_keyboard;
 use crate::utils::text_const::{INVALID_COMMAND_TEXT, UNKNOWN_ERROR};
@@ -33,41 +35,6 @@ use crate::utils::text_const::{INVALID_COMMAND_TEXT, UNKNOWN_ERROR};
 type MyDialogue = Dialogue<State, ErasedStorage<State>>;
 type MyStorage = std::sync::Arc<ErasedStorage<State>>;
 type HandlerResult = Result<(), Box<dyn std::error::Error + Send + Sync>>;
-
-#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
-pub enum State { // todo replace in enums
-    #[default]
-    Start,
-    // Listen buttons click
-    ListenStartButtonsCallback,
-    ListenGetPortfolioButtonsCallback,
-    ListenEditPortfolioButtonsCallback,
-    ListenSetBaseCurrencyButtonsCallback,
-    ListenCategoryCallback {
-        account_name: String,
-        outcome: u32,
-    },
-    // Listen client data from chat
-    ListenBalanceNameCallback,
-    ListenNewAccountName,
-    ListenAccountIncomeFor(String),
-    ListenAccountOutcomeFor(String),
-    ListenCurrencyForCallback(String),
-    ListenLocationForCallback(String),
-    ListenTypeForCallback(String),
-    // Get client data from chat for each listen
-    GotListenAccountNameListenAccountButtonsCallback(String),
-    GotNewAccountName(String),
-}
-
-#[derive(Clone, Debug, BotCommands)]
-#[command(rename_rule = "lowercase")]
-pub enum Command {
-    #[command(description = "В начало")]
-    Start,
-    #[command(description = "Показать все команды")]
-    Help,
-}
 
 #[tokio::main]
 async fn main() {
@@ -77,7 +44,7 @@ async fn main() {
 
     let bot = Bot::from_env();
 
-    Portfolio::create_tables().unwrap();
+    DataBaseTables::create_tables().unwrap();
 
     let storage: MyStorage = SqliteStorage::open("state.sqlite", Json).await.unwrap().erase();
 

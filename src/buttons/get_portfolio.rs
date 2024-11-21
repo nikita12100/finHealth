@@ -4,8 +4,8 @@ use teloxide::prelude::{CallbackQuery, Requester};
 use crate::{goto_start, invalid_input_for_callback, HandlerResult, MyDialogue};
 use crate::charts::draw_line::DrawLine;
 use crate::charts::draw_pie::DrawPie;
+use crate::db::database::db_portfolio::DataBasePortfolio;
 use crate::db::portfolio::Portfolio;
-use crate::db::db::DataBase;
 
 pub struct GetPortfolioButtons {}
 
@@ -81,7 +81,7 @@ pub async fn handler_get_portfolio_btn(bot: Bot, dialogue: MyDialogue, q: Callba
                 goto_start(bot, dialogue, chat_id, None).await?;
             }
             GetPortfolioButtons::RAW_BALANCE => {
-                bot.send_message(chat_id, format!("Ваш портфель: {:#?}", portfolio)).await?;
+                bot.send_message(chat_id, format!("Ваш портфель: {:#?}", portfolio)).await?; // todo refactor
                 goto_start(bot, dialogue, chat_id, None).await?;
             }
             _ => {

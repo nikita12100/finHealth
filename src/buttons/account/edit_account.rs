@@ -7,7 +7,7 @@ use crate::buttons::account::set_location::ButtonLocation;
 use crate::buttons::account::set_type::ButtonType;
 use crate::buttons::set_currency::ButtonCurrency;
 use crate::db::portfolio::Portfolio;
-use crate::db::db::DataBase;
+use crate::db::database::db_portfolio::DataBasePortfolio;
 use crate::utils::common::make_keyboard_string;
 
 pub struct EditAccountButton;
@@ -37,39 +37,42 @@ pub async fn handler_update_account_btn(bot: Bot, dialogue: MyDialogue, account_
     if let Some(mut portfolio) = Portfolio::get(q.chat_id().unwrap().0) {
         match q.data.clone().unwrap().as_str() {
             EditAccountButton::INCOME_AMOUNT => {
-                bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "введите доход:").await?;
+                bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "Введите сумму дохода:").await?;
 
                 dialogue.update(State::ListenAccountIncomeFor(account_name)).await?;
             }
             EditAccountButton::OUTCOME_AMOUNT => {
-                bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "введите расход:").await?;
+                bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "Введите сумму расхода:").await?;
 
                 dialogue.update(State::ListenAccountOutcomeFor(account_name)).await?;
             }
             EditAccountButton::SET_CURRENCY => {
-                bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to SET_CURRENCY").await?;
+                let current_currency = portfolio.get_account(&*account_name).unwrap().get_currency().clone();
+                bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), format!("Текущая валюта счета {}", current_currency.to_string())).await?;
 
                 dialogue.update(State::ListenCurrencyForCallback(account_name)).await?;
-                bot.send_message(chat_id, "Chose").reply_markup(make_keyboard_string(1, ButtonCurrency::get_currencies())).await?;
+                bot.send_message(chat_id, "Выберите валюту").reply_markup(make_keyboard_string(1, ButtonCurrency::get_currencies())).await?;
             }
             EditAccountButton::SET_LOCATION => {
-                bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to SET_LOCATION").await?;
+                let current_location = portfolio.get_account(&*account_name).unwrap().get_location().clone();
+                bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), format!("Текущая локация счета {}", current_location.to_string())).await?;
 
                 dialogue.update(State::ListenLocationForCallback(account_name)).await?;
-                bot.send_message(chat_id, "Chose").reply_markup(make_keyboard_string(1, ButtonLocation::get_locations())).await?;
+                bot.send_message(chat_id, "Выберите локацию").reply_markup(make_keyboard_string(1, ButtonLocation::get_locations())).await?;
             }
             EditAccountButton::SET_TYPE => {
-                bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to SET_TYPE").await?;
+                let current_type = portfolio.get_account(&*account_name).unwrap().get_type().clone();
+
+                bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), format!("Текущий тип счета {}", current_type.to_string())).await?;
 
                 dialogue.update(State::ListenTypeForCallback(account_name)).await?;
-                bot.send_message(chat_id, "Chose").reply_markup(make_keyboard_string(1, ButtonType::get_types())).await?;
+                bot.send_message(chat_id, "Выберите тип").reply_markup(make_keyboard_string(1, ButtonType::get_types())).await?;
             }
             EditAccountButton::REMOVE_BALANCE => {
-                bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to REMOVE_BALANCE").await?;
+                bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "Вы хотите удалить счет").await?;
                 let account = portfolio.get_account(&*account_name).unwrap();
 
-
-                portfolio.delete_account(&account);
+                portfolio.delete_account(&account); // todo удаление не работает, т.к. надо удалять из бд
                 portfolio.save(chat_id)?;
                 bot.send_message(chat_id, format!("Баланс {} успешно удален", account.get_name())).await?;
                 goto_start(bot, dialogue, chat_id, None).await?;
@@ -79,7 +82,7 @@ pub async fn handler_update_account_btn(bot: Bot, dialogue: MyDialogue, account_
             }
         }
     } else {
-        log::error!("Portfolio not found for {}", chat_id);
+        log::error!("Portfolio not found for {}", chat_id); // todo заменить все на unwrap_or(empty) с сохранением в бд
         init_portfolio(chat_id)?;
         let error = "Простите, произошла ошибка :(\nCode 1\nПовторите операцию";
         goto_start(bot, dialogue, chat_id, Some(error.to_string())).await?;
