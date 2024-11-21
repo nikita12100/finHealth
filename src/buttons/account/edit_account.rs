@@ -6,6 +6,7 @@ use crate::{goto_start, init_portfolio, invalid_input_for_callback, HandlerResul
 use crate::buttons::account::set_location::ButtonLocation;
 use crate::buttons::account::set_type::ButtonType;
 use crate::buttons::set_currency::ButtonCurrency;
+use crate::db::database::db_account::DataBaseAccount;
 use crate::db::portfolio::Portfolio;
 use crate::db::database::db_portfolio::DataBasePortfolio;
 use crate::utils::common::make_keyboard_string;
@@ -71,9 +72,8 @@ pub async fn handler_update_account_btn(bot: Bot, dialogue: MyDialogue, account_
             EditAccountButton::REMOVE_BALANCE => {
                 bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "Вы хотите удалить счет").await?;
                 let account = portfolio.get_account(&*account_name).unwrap();
+                account.delete()?;
 
-                portfolio.delete_account(&account); // todo удаление не работает, т.к. надо удалять из бд
-                portfolio.save(chat_id)?;
                 bot.send_message(chat_id, format!("Баланс {} успешно удален", account.get_name())).await?;
                 goto_start(bot, dialogue, chat_id, None).await?;
             }

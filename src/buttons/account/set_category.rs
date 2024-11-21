@@ -2,6 +2,7 @@ use teloxide::Bot;
 use teloxide::dispatching::dialogue::GetChatId;
 use teloxide::prelude::{CallbackQuery, Requester};
 use crate::{goto_start, init_portfolio, invalid_input_for_callback, HandlerResult, MyDialogue};
+use crate::db::database::db_account::DataBaseAccount;
 use crate::db::database::db_portfolio::DataBasePortfolio;
 use crate::db::portfolio::Portfolio;
 use crate::enums::category::Category;
@@ -31,8 +32,9 @@ pub async fn handler_category_btn(
 
         let category: Category = data.as_str().to_owned().parse::<Category>().unwrap();
         if let Some(mut portfolio) = Portfolio::get(q.chat_id().unwrap().0) {
-            portfolio.get_account_mut(&*account_name).unwrap().add_balance_outcome(outcome, category);
-            portfolio.save(chat_id)?;
+            let account = portfolio.get_account_mut(&*account_name).unwrap();
+            account.add_balance_outcome(outcome, category);
+            account.save(chat_id)?;
 
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "Расход успешно сохранен").await?;
 

@@ -58,3 +58,5 @@ pub(crate) const INSERT_BALANCE_SQL: &'static str =
 pub(crate) const SELECT_PORTFOLIO_SQL: &'static str = "SELECT base_currency, exchange_rate FROM portfolio WHERE id = :id";
 pub(crate) const SELECT_ACCOUNT_SQL: &'static str = "SELECT id, name, currency, asset_location, asset_type FROM account where chat_id = :chat_id";
 pub(crate) const SELECT_BALANCE_SQL: &'static str = "SELECT id, amount, category, date FROM balance where account_id = :account_id";
+
+pub(crate) const DELETE_ACCOUNT_SQL: &'static str = "DELETE FROM account where id = :id";

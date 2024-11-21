@@ -4,6 +4,7 @@ use teloxide::prelude::{Message, Requester};
 use crate::{goto_start, init_portfolio, HandlerResult, MyDialogue, State};
 use crate::buttons::account::set_category::ButtonCategory;
 use crate::db::account::Account;
+use crate::db::database::db_account::DataBaseAccount;
 use crate::db::database::db_portfolio::DataBasePortfolio;
 use crate::db::portfolio::Portfolio;
 use crate::enums::asset_location::AssetLocation;
@@ -73,9 +74,9 @@ pub async fn listen_account_income_amount(
     match msg.text().unwrap().parse::<u32>() {
         Ok(income) => {
             if let Some(mut portfolio) = Portfolio::get(chat_id.0) {
-                portfolio.get_account_mut(&*account_name).unwrap().add_balance_income(income);
-                portfolio.save(chat_id)?;
-                let account = portfolio.get_account(&*account_name).unwrap();
+                let account = portfolio.get_account_mut(&*account_name).unwrap();
+                account.add_balance_income(income);
+                account.save(chat_id)?;
                 let last_amount = account.get_last_amount().unwrap();
                 bot.send_message(chat_id, format!("Счет \"{}\" успешно обновлен, текущий баланс {}", account_name, last_amount)).await?;
                 goto_start(bot, dialogue, chat_id, None).await?;
