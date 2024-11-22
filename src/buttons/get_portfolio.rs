@@ -1,11 +1,14 @@
 use teloxide::Bot;
 use teloxide::dispatching::dialogue::GetChatId;
+use teloxide::payloads::SendMessageSetters;
 use teloxide::prelude::{CallbackQuery, Requester};
-use crate::{goto_start, invalid_input_for_callback, HandlerResult, MyDialogue};
+use crate::{get_or_create_portfolio, goto_start, invalid_input_for_callback, HandlerResult, MyDialogue};
 use crate::charts::draw_line::DrawLine;
 use crate::charts::draw_pie::DrawPie;
 use crate::db::database::db_portfolio::DataBasePortfolio;
 use crate::db::portfolio::Portfolio;
+use crate::enums::state::State;
+use crate::utils::common::make_keyboard_string;
 
 pub struct GetPortfolioButtons {}
 
@@ -63,16 +66,18 @@ pub async fn handler_get_portfolio_btn(bot: Bot, dialogue: MyDialogue, q: Callba
                 goto_start(bot, dialogue, chat_id, None).await?;
             }
             GetPortfolioButtons::DRAW_WEEK_SPENDS => {
-                let pie_chart = portfolio.draw_pie_spends("daily".to_string(), 7); // todo remove daily
+                bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "Для какого портфеля показать недельные траты?").await?;
 
-                bot.send_photo(chat_id, pie_chart).await?;
-                goto_start(bot, dialogue, chat_id, None).await?;
+                let accounts_name = portfolio.get_account_names();
+                dialogue.update(State::ListenBalanceNameSpendsCallback(7)).await?;
+                bot.send_message(chat_id, "Выберите какой баланс вы хотите изменить:").reply_markup(make_keyboard_string(1, accounts_name)).await?;
             }
             GetPortfolioButtons::DRAW_MONTH_SPENDS => {
-                let pie_chart = portfolio.draw_pie_spends("daily".to_string(), 30);
+                bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "Для какого портфеля показать месячные траты?").await?;
 
-                bot.send_photo(chat_id, pie_chart).await?;
-                goto_start(bot, dialogue, chat_id, None).await?;
+                let accounts_name = portfolio.get_account_names();
+                dialogue.update(State::ListenBalanceNameSpendsCallback(30)).await?;
+                bot.send_message(chat_id, "Выберите какой баланс вы хотите изменить:").reply_markup(make_keyboard_string(1, accounts_name)).await?;
             }
             GetPortfolioButtons::DRAW_LINE_ALL_HIST => {
                 let line_chart = portfolio.draw_line_test();
@@ -81,7 +86,10 @@ pub async fn handler_get_portfolio_btn(bot: Bot, dialogue: MyDialogue, q: Callba
                 goto_start(bot, dialogue, chat_id, None).await?;
             }
             GetPortfolioButtons::RAW_BALANCE => {
-                bot.send_message(chat_id, format!("Ваш портфель: {:#?}", portfolio)).await?; // todo refactor
+                bot.send_message(chat_id, format!("{:#?}", portfolio.get_base_currency())).await?;
+                bot.send_message(chat_id, format!("{:#?}", portfolio.get_exchange_rate())).await?;
+                bot.send_message(chat_id, format!("{:#?}", portfolio.get_all_accounts())).await?;
+
                 goto_start(bot, dialogue, chat_id, None).await?;
             }
             _ => {
@@ -92,5 +100,24 @@ pub async fn handler_get_portfolio_btn(bot: Bot, dialogue: MyDialogue, q: Callba
         let error = "У вас нет счетов, необходимо их добавить";
         goto_start(bot, dialogue, chat_id, Some(error.to_string())).await?;
     }
+    Ok(())
+}
+
+pub async fn handler_get_spends_btn(bot: Bot, dialogue: MyDialogue, num_days: u32, q: CallbackQuery) -> HandlerResult {
+    bot.answer_callback_query(&q.id).await?;
+    let chat_id = q.chat_id().unwrap();
+
+    let portfolio = get_or_create_portfolio(chat_id);
+    let balance_name = q.data.clone().unwrap().to_string();
+    let accounts_name = portfolio.get_account_names();
+    assert!(accounts_name.contains(&balance_name));
+
+    bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), format!("Статистика трат по счету {} за {} дней", balance_name, num_days)).await?;
+
+    let pie_chart = portfolio.draw_pie_spends(balance_name, num_days);
+
+    bot.send_photo(chat_id, pie_chart).await?;
+    goto_start(bot, dialogue, chat_id, None).await?;
+
     Ok(())
 }

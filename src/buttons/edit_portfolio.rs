@@ -39,10 +39,11 @@ pub async fn handler_update_portfolio_btn(bot: Bot, dialogue: MyDialogue, q: Cal
             bot.send_message(chat_id, "Выберите новую валюту портфеля").reply_markup(make_keyboard_string(1, ButtonCurrency::get_currencies())).await?;
         }
         EditPortfolioButton::SET_EXCHANGE_RATE => {
-            bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "Текущие курсы валют ...").await?;
+            bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), format!("Текущие курсы валют {:#?}", portfolio.get_exchange_rate())).await?;
 
-            goto_start(bot, dialogue, chat_id, Some("Еще не готово".to_string())).await?;
-            // todo!() // авто получение курса + ручная установка
+            // dialogue.update(State::ListenCurrencyForExchangeCallback).await?;
+            // bot.send_message(chat_id, "Выберите курс какой валюты необходимо изменить:").reply_markup(make_keyboard_string(1, ButtonCurrency::get_currencies())).await?;
+            goto_start(bot, dialogue, chat_id, Some("еще не готово".to_string())).await?;
         }
         _ => {
             invalid_input_for_callback(bot, dialogue, q, format!("Необходимо выбрать одну из кнопок {:?}", EditPortfolioButton::VALUES.to_vec())).await?;

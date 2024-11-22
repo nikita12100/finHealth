@@ -19,7 +19,7 @@ use crate::buttons::account::set_category::handler_category_btn;
 use crate::buttons::account::set_location::handler_location_btn;
 use crate::buttons::account::set_type::handler_type_btn;
 use crate::buttons::edit_portfolio::handler_update_portfolio_btn;
-use crate::buttons::get_portfolio::handler_get_portfolio_btn;
+use crate::buttons::get_portfolio::{handler_get_portfolio_btn, handler_get_spends_btn};
 use crate::buttons::set_currency::{handler_set_base_currency_btn, handler_set_currency_btn};
 use crate::buttons::start::{handler_start_btn, StartButton};
 use crate::buttons::update_portfolio::handler_update_balance_btn;
@@ -65,12 +65,14 @@ async fn main() {
                 .branch(dptree::case![State::ListenStartButtonsCallback].endpoint(handler_start_btn))
                 .branch(dptree::case![State::ListenGetPortfolioButtonsCallback].endpoint(handler_get_portfolio_btn))
                 .branch(dptree::case![State::ListenEditPortfolioButtonsCallback].endpoint(handler_update_portfolio_btn))
-                .branch(dptree::case![State::ListenCurrencyForCallback(account_name)].endpoint(handler_set_currency_btn))
+                .branch(dptree::case![State::ListenCurrencyForAccountCallback(account_name)].endpoint(handler_set_currency_btn))
+                // .branch(dptree::case![State::ListenCurrencyForExchangeCallback(account_name)].endpoint(handler_set_currency_exchange_btn))
                 .branch(dptree::case![State::ListenLocationForCallback(account_name)].endpoint(handler_location_btn))
                 .branch(dptree::case![State::ListenTypeForCallback(account_name)].endpoint(handler_type_btn))
                 .branch(dptree::case![State::ListenSetBaseCurrencyButtonsCallback].endpoint(handler_set_base_currency_btn))
                 .branch(dptree::case![State::ListenCategoryCallback{account_name, outcome}].endpoint(handler_category_btn))
-                .branch(dptree::case![State::ListenBalanceNameCallback].endpoint(handler_update_balance_btn))
+                .branch(dptree::case![State::ListenBalanceNameUpdateBalanceCallback].endpoint(handler_update_balance_btn))
+                .branch(dptree::case![State::ListenBalanceNameSpendsCallback(days)].endpoint(handler_get_spends_btn))
                 .branch(dptree::case![State::GotListenAccountNameListenAccountButtonsCallback(account_name)].endpoint(handler_update_account_btn))
                 .endpoint(|b, d, q| invalid_input_for_callback(b, d, q, UNKNOWN_ERROR.to_string())),
         );

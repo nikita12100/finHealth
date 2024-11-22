@@ -9,7 +9,7 @@ use crate::utils::common::total_sum_spaced;
 
 pub trait DrawPie {
     fn draw_pie_name_allocations(&self) -> InputFile;
-    fn draw_pie_spends(&self, account_name: String, num_days: u64) -> InputFile;
+    fn draw_pie_spends(&self, account_name: String, num_days: u32) -> InputFile;
     fn draw_pie_type_allocations(&self) -> InputFile;
     fn draw_pie_location_allocations(&self) -> InputFile;
     fn draw_pie_currency_allocations(&self) -> InputFile;
@@ -29,8 +29,8 @@ impl DrawPie for Portfolio {
         Self::draw_pie_from_distribution(distribution_amount, "Срез по всем балансам")
     }
 
-    fn draw_pie_spends(&self, account_name: String, num_days: u64) -> InputFile {
-        let week_threshold = Utc::now().checked_sub_days(Days::new(num_days)).unwrap();
+    fn draw_pie_spends(&self, account_name: String, num_days: u32) -> InputFile {
+        let week_threshold = Utc::now().checked_sub_days(Days::new(num_days as u64)).unwrap();
         let account = self.get_all_accounts().iter().find(|account| account.get_name() == account_name).unwrap();
 
         let mut distribution_spends: HashMap<String, u32> = HashMap::new();

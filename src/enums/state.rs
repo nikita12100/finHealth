@@ -12,11 +12,13 @@ pub enum State {
         outcome: u32,
     },
     // Listen client data from chat
-    ListenBalanceNameCallback,
+    ListenBalanceNameUpdateBalanceCallback,
+    ListenBalanceNameSpendsCallback(u32),
     ListenNewAccountName,
     ListenAccountIncomeFor(String),
     ListenAccountOutcomeFor(String),
-    ListenCurrencyForCallback(String),
+    ListenCurrencyForAccountCallback(String),
+    // ListenCurrencyForExchangeCallback,
     ListenLocationForCallback(String),
     ListenTypeForCallback(String),
     // Get client data from chat for each listen

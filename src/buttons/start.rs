@@ -8,7 +8,7 @@ use crate::buttons::update_portfolio::UpdatePortfolioButton;
 use crate::db::database::db_portfolio::DataBasePortfolio;
 use crate::db::portfolio::Portfolio;
 use crate::utils::common::make_keyboard_string;
-use crate::utils::mock_data::MockData;
+use crate::utils::text_const::HELP_MESSAGE;
 
 pub struct StartButton;
 
@@ -40,7 +40,7 @@ pub async fn handler_start_btn(bot: Bot, dialogue: MyDialogue, q: CallbackQuery)
                 accounts.extend(buttons);
 
                 bot.send_message(chat_id, "Выберите какой баланс вы хотите изменить:").reply_markup(make_keyboard_string(1, accounts)).await?;
-                dialogue.update(State::ListenBalanceNameCallback).await?;
+                dialogue.update(State::ListenBalanceNameUpdateBalanceCallback).await?;
             } else {
                 get_or_create_portfolio(chat_id);
                 bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "У вас нет баланса, давайте добавим первый").await?;
@@ -49,11 +49,9 @@ pub async fn handler_start_btn(bot: Bot, dialogue: MyDialogue, q: CallbackQuery)
             }
         }
         StartButton::HELP => {
-            bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "you want to HELP").await?;
-            // todo тут нежно сообщение
-            MockData::create().save(chat_id)?; // todo dev
+            bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "Как работать с ботом:").await?;
 
-            goto_start(bot, dialogue, chat_id, None).await?;
+            goto_start(bot, dialogue, chat_id, Some(HELP_MESSAGE.to_string())).await?;
         }
         _ => {
             invalid_input_for_callback(bot, dialogue, q, format!("Необходимо выбрать одну из кнопок {:?}", StartButton::VALUES.to_vec())).await?;

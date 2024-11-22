@@ -49,7 +49,7 @@ pub async fn handler_update_account_btn(bot: Bot, dialogue: MyDialogue, account_
             let current_currency = portfolio.get_account(&*account_name).unwrap().get_currency().clone();
             bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), format!("Текущая валюта счета {}", current_currency.to_string())).await?;
 
-            dialogue.update(State::ListenCurrencyForCallback(account_name)).await?;
+            dialogue.update(State::ListenCurrencyForAccountCallback(account_name)).await?;
             bot.send_message(chat_id, "Выберите валюту").reply_markup(make_keyboard_string(1, ButtonCurrency::get_currencies())).await?;
         }
         EditAccountButton::SET_LOCATION => {
