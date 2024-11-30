@@ -1,11 +1,13 @@
-use std::str::FromStr;
-use teloxide::Bot;
-use teloxide::dispatching::dialogue::GetChatId;
-use teloxide::prelude::{CallbackQuery, Requester};
-use crate::{get_or_create_portfolio, goto_start, invalid_input_for_callback, HandlerResult, MyDialogue};
 use crate::db::database::db_account::DataBaseAccount;
 use crate::db::database::db_portfolio::DataBasePortfolio;
 use crate::enums::currency::Currency;
+use crate::{
+    get_or_create_portfolio, goto_start, invalid_input_for_callback, HandlerResult, MyDialogue,
+};
+use std::str::FromStr;
+use teloxide::dispatching::dialogue::GetChatId;
+use teloxide::prelude::{CallbackQuery, Requester};
+use teloxide::Bot;
 
 pub struct ButtonCurrency {}
 impl ButtonCurrency {
@@ -18,7 +20,11 @@ impl ButtonCurrency {
     }
 }
 
-pub async fn handler_set_base_currency_btn(bot: Bot, dialogue: MyDialogue, q: CallbackQuery) -> HandlerResult {
+pub async fn handler_set_base_currency_btn(
+    bot: Bot,
+    dialogue: MyDialogue,
+    q: CallbackQuery,
+) -> HandlerResult {
     let chat_id = q.chat_id().unwrap();
     if ButtonCurrency::get_currencies().contains(&q.data.clone().unwrap()) {
         let mut portfolio = get_or_create_portfolio(chat_id);
@@ -26,15 +32,37 @@ pub async fn handler_set_base_currency_btn(bot: Bot, dialogue: MyDialogue, q: Ca
         portfolio.set_base_currency(new_base_currency.clone());
         portfolio.save(chat_id)?;
 
-        bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), format!("Валюта портфеля изменена на {}", new_base_currency.to_string())).await?;
+        bot.edit_message_text(
+            chat_id,
+            q.message.clone().unwrap().id(),
+            format!(
+                "Валюта портфеля изменена на {}",
+                new_base_currency.to_string()
+            ),
+        )
+        .await?;
         goto_start(bot, dialogue, chat_id, None).await?;
     } else {
-        invalid_input_for_callback(bot, dialogue, q, format!("Необходимо выбрать одну из кнопок {:?}", ButtonCurrency::get_currencies())).await?;
+        invalid_input_for_callback(
+            bot,
+            dialogue,
+            q,
+            format!(
+                "Необходимо выбрать одну из кнопок {:?}",
+                ButtonCurrency::get_currencies()
+            ),
+        )
+        .await?;
     }
     Ok(())
 }
 
-pub async fn handler_set_currency_btn(bot: Bot, dialogue: MyDialogue, account_name: String, q: CallbackQuery) -> HandlerResult {
+pub async fn handler_set_currency_btn(
+    bot: Bot,
+    dialogue: MyDialogue,
+    account_name: String,
+    q: CallbackQuery,
+) -> HandlerResult {
     let chat_id = q.chat_id().unwrap();
     if ButtonCurrency::get_currencies().contains(&q.data.clone().unwrap()) {
         let mut portfolio = get_or_create_portfolio(chat_id);
@@ -43,11 +71,28 @@ pub async fn handler_set_currency_btn(bot: Bot, dialogue: MyDialogue, account_na
         account.set_currency(new_base_currency.clone());
         account.save(chat_id)?;
 
-        bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), format!("Валюта счета {} изменена на {}", account_name, new_base_currency)).await?;
+        bot.edit_message_text(
+            chat_id,
+            q.message.clone().unwrap().id(),
+            format!(
+                "Валюта счета {} изменена на {}",
+                account_name, new_base_currency
+            ),
+        )
+        .await?;
 
         goto_start(bot, dialogue, chat_id, None).await?;
     } else {
-        invalid_input_for_callback(bot, dialogue, q, format!("Необходимо выбрать одну из кнопок {:?}", ButtonCurrency::get_currencies())).await?;
+        invalid_input_for_callback(
+            bot,
+            dialogue,
+            q,
+            format!(
+                "Необходимо выбрать одну из кнопок {:?}",
+                ButtonCurrency::get_currencies()
+            ),
+        )
+        .await?;
     }
     Ok(())
 }

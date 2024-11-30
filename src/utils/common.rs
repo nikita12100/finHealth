@@ -25,14 +25,16 @@ pub fn generate_colors(size: u8, base_color: RGBColor) -> Vec<RGBColor> {
         let next_color = RGBColor(
             base_color.0.overflowing_add(i.overflowing_mul(step).0).0,
             base_color.1.overflowing_sub(i.overflowing_mul(step).0).0,
-            base_color.2.overflowing_add(i.overflowing_mul(step.overflowing_mul(2).0).0).0,
+            base_color
+                .2
+                .overflowing_add(i.overflowing_mul(step.overflowing_mul(2).0).0)
+                .0,
         );
         colors.push(next_color);
     }
 
     colors
 }
-
 
 pub fn make_keyboard_string(row_size: usize, buttons: Vec<String>) -> InlineKeyboardMarkup {
     let strings = buttons.iter().map(|s| s.as_str()).collect();
@@ -58,5 +60,7 @@ pub fn date_to_str(date: DateTime<Utc>) -> String {
 }
 
 pub fn str_to_date(date: String) -> DateTime<Utc> {
-    DateTime::parse_from_rfc3339(&date).unwrap().with_timezone(&Utc)
+    DateTime::parse_from_rfc3339(&date)
+        .unwrap()
+        .with_timezone(&Utc)
 }

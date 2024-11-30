@@ -1,9 +1,8 @@
+use crate::enums::category::Category::*;
 use std::slice::Iter;
 use strum_macros::{Display, EnumString, IntoStaticStr};
-use crate::enums::category::Category::*;
 
-#[derive(Clone, Debug, Default, PartialEq)]
-#[derive(Display, EnumString, IntoStaticStr)]
+#[derive(Clone, Debug, Default, PartialEq, Display, EnumString, IntoStaticStr)]
 pub enum Category {
     #[default]
     #[strum(serialize = "❓ Другое")]
@@ -64,6 +63,13 @@ impl Category {
             House,
         ];
         VALUES.iter()
+    }
+
+    pub fn name(&self) -> String {
+        self.to_string()
+            .chars()
+            .filter(|c| c.is_alphanumeric() || c.is_whitespace())
+            .collect()
     }
 }
 

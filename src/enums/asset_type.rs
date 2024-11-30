@@ -1,9 +1,8 @@
+use crate::enums::asset_type::AssetType::*;
 use std::slice::Iter;
 use strum_macros::{Display, EnumString, IntoStaticStr};
-use crate::enums::asset_type::AssetType::*;
 
-#[derive(Clone, Debug, Default, PartialEq)]
-#[derive(Display, EnumString, IntoStaticStr)]
+#[derive(Clone, Debug, Default, PartialEq, Display, EnumString, IntoStaticStr)]
 pub enum AssetType {
     #[default]
     #[strum(serialize = "cash")]
@@ -26,16 +25,8 @@ pub enum AssetType {
 
 impl AssetType {
     pub fn iterator() -> Iter<'static, AssetType> {
-        static VALUES: [AssetType; 8] = [
-            Cash,
-            Crypto,
-            Repo,
-            Gold,
-            Deposit,
-            Share,
-            Bond,
-            BondCurrency,
-        ];
+        static VALUES: [AssetType; 8] =
+            [Cash, Crypto, Repo, Gold, Deposit, Share, Bond, BondCurrency];
         VALUES.iter()
     }
 }

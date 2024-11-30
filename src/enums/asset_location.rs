@@ -1,9 +1,8 @@
+use crate::enums::asset_location::AssetLocation::*;
 use std::slice::Iter;
 use strum_macros::{Display, EnumString, IntoStaticStr};
-use crate::enums::asset_location::AssetLocation::*;
 
-#[derive(Clone, Debug, Default, PartialEq)]
-#[derive(Display, EnumString, IntoStaticStr)]
+#[derive(Clone, Debug, Default, PartialEq, Display, EnumString, IntoStaticStr)]
 pub enum AssetLocation {
     #[default]
     #[strum(serialize = "Other")]

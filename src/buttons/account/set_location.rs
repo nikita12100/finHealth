@@ -1,10 +1,12 @@
-use std::str::FromStr;
-use teloxide::Bot;
-use teloxide::dispatching::dialogue::GetChatId;
-use teloxide::prelude::{CallbackQuery, Requester};
-use crate::{get_or_create_portfolio, goto_start, invalid_input_for_callback, HandlerResult, MyDialogue};
 use crate::db::database::db_account::DataBaseAccount;
 use crate::enums::asset_location::AssetLocation;
+use crate::{
+    get_or_create_portfolio, goto_start, invalid_input_for_callback, HandlerResult, MyDialogue,
+};
+use std::str::FromStr;
+use teloxide::dispatching::dialogue::GetChatId;
+use teloxide::prelude::{CallbackQuery, Requester};
+use teloxide::Bot;
 
 pub struct ButtonLocation {}
 impl ButtonLocation {
@@ -34,11 +36,25 @@ pub async fn handler_location_btn(
         account.set_location(location.clone());
         account.save(chat_id)?;
 
-        bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), format!("Локация успешно обновлена на {}", location)).await?;
+        bot.edit_message_text(
+            chat_id,
+            q.message.clone().unwrap().id(),
+            format!("Локация успешно обновлена на {}", location),
+        )
+        .await?;
 
         goto_start(bot, dialogue, chat_id, None).await?;
     } else {
-        invalid_input_for_callback(bot, dialogue, q, format!("Необходимо выбрать одну из кнопок {:?}", ButtonLocation::get_locations())).await?;
+        invalid_input_for_callback(
+            bot,
+            dialogue,
+            q,
+            format!(
+                "Необходимо выбрать одну из кнопок {:?}",
+                ButtonLocation::get_locations()
+            ),
+        )
+        .await?;
     }
     Ok(())
 }

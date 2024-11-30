@@ -24,29 +24,25 @@ impl ExchangeRate {
         }
     }
     pub fn convert(&self, amount: f32, from: &Currency, to: &Currency) -> f32 {
-        if from.eq(to) { amount } else {
+        if from.eq(to) {
+            amount
+        } else {
             match from {
-                Currency::Rub => {
-                    match to {
-                        Currency::Rub => amount,
-                        Currency::Usd => amount * self.rub_usd,
-                        Currency::Eur => amount * self.rub_eur,
-                    }
-                }
-                Currency::Usd => {
-                    match to {
-                        Currency::Rub => amount * self.usd_rub,
-                        Currency::Usd => amount,
-                        Currency::Eur => amount * self.usd_eur,
-                    }
-                }
-                Currency::Eur => {
-                    match to {
-                        Currency::Rub => amount * self.eur_usd,
-                        Currency::Usd => amount * self.eur_usd,
-                        Currency::Eur => amount,
-                    }
-                }
+                Currency::Rub => match to {
+                    Currency::Rub => amount,
+                    Currency::Usd => amount * self.rub_usd,
+                    Currency::Eur => amount * self.rub_eur,
+                },
+                Currency::Usd => match to {
+                    Currency::Rub => amount * self.usd_rub,
+                    Currency::Usd => amount,
+                    Currency::Eur => amount * self.usd_eur,
+                },
+                Currency::Eur => match to {
+                    Currency::Rub => amount * self.eur_usd,
+                    Currency::Usd => amount * self.eur_usd,
+                    Currency::Eur => amount,
+                },
             }
         }
     }
@@ -58,6 +54,7 @@ pub trait Convert {
 
 impl Convert for Portfolio {
     fn convert(&self, amount: u32, from: &Currency) -> u32 {
-        self.get_exchange_rate().convert(amount as f32, from, self.get_base_currency()) as u32
+        self.get_exchange_rate()
+            .convert(amount as f32, from, self.get_base_currency()) as u32
     }
 }

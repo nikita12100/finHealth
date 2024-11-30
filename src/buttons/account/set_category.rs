@@ -1,9 +1,11 @@
-use teloxide::Bot;
-use teloxide::dispatching::dialogue::GetChatId;
-use teloxide::prelude::{CallbackQuery, Requester};
-use crate::{get_or_create_portfolio, goto_start, invalid_input_for_callback, HandlerResult, MyDialogue};
 use crate::db::database::db_account::DataBaseAccount;
 use crate::enums::category::Category;
+use crate::{
+    get_or_create_portfolio, goto_start, invalid_input_for_callback, HandlerResult, MyDialogue,
+};
+use teloxide::dispatching::dialogue::GetChatId;
+use teloxide::prelude::{CallbackQuery, Requester};
+use teloxide::Bot;
 
 pub struct ButtonCategory {}
 
@@ -33,11 +35,25 @@ pub async fn handler_category_btn(
         account.add_balance_outcome(outcome, category);
         account.save(chat_id)?;
 
-        bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), "Расход успешно сохранен").await?;
+        bot.edit_message_text(
+            chat_id,
+            q.message.clone().unwrap().id(),
+            "Расход успешно сохранен",
+        )
+        .await?;
 
         goto_start(bot, dialogue, chat_id, None).await?;
     } else {
-        invalid_input_for_callback(bot, dialogue, q, format!("Необходимо выбрать одну из кнопок {:?}", ButtonCategory::get_categories())).await?;
+        invalid_input_for_callback(
+            bot,
+            dialogue,
+            q,
+            format!(
+                "Необходимо выбрать одну из кнопок {:?}",
+                ButtonCategory::get_categories()
+            ),
+        )
+        .await?;
     }
     Ok(())
 }

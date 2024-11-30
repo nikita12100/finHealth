@@ -1,9 +1,8 @@
+use crate::enums::currency::Currency::*;
 use std::slice::Iter;
 use strum_macros::{Display, EnumString, IntoStaticStr};
-use crate::enums::currency::Currency::*;
 
-#[derive(Clone, Debug, Default, PartialEq)]
-#[derive(Display, EnumString, IntoStaticStr)]
+#[derive(Clone, Debug, Default, PartialEq, Display, EnumString, IntoStaticStr)]
 pub enum Currency {
     #[default]
     #[strum(serialize = "RUB")]

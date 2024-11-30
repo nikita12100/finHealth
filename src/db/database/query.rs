@@ -1,15 +1,13 @@
 pub(crate) const DB_NAME: &'static str = "portfolios.db";
 
 // ========================================== <TABLES> ==========================================
-pub(crate) const CREATE_PORTFOLIO_SQL: &'static str =
-    "CREATE TABLE IF NOT EXISTS portfolio (
+pub(crate) const CREATE_PORTFOLIO_SQL: &'static str = "CREATE TABLE IF NOT EXISTS portfolio (
         id             INTEGER PRIMARY KEY,
         base_currency  INTEGER NOT NULL DEFAULT 0,
         exchange_rate  TEXT
     )";
 
-pub(crate) const CREATE_ACCOUNT_SQL: &'static str =
-    "CREATE TABLE IF NOT EXISTS account (
+pub(crate) const CREATE_ACCOUNT_SQL: &'static str = "CREATE TABLE IF NOT EXISTS account (
         id              TEXT PRIMARY KEY,
         chat_id         INTEGER NOT NULL,
         name            TEXT,
@@ -18,8 +16,7 @@ pub(crate) const CREATE_ACCOUNT_SQL: &'static str =
         asset_type      INTEGER NOT NULL DEFAULT 0
     )";
 
-pub(crate) const CREATE_BALANCE_SQL: &'static str =
-    "CREATE TABLE IF NOT EXISTS balance (
+pub(crate) const CREATE_BALANCE_SQL: &'static str = "CREATE TABLE IF NOT EXISTS balance (
         id              TEXT PRIMARY KEY,
         account_id      TEXT NOT NULL,
         amount          INTEGER NOT NULL,
@@ -55,8 +52,11 @@ pub(crate) const INSERT_BALANCE_SQL: &'static str =
      date=EXCLUDED.date
      ";
 
-pub(crate) const SELECT_PORTFOLIO_SQL: &'static str = "SELECT base_currency, exchange_rate FROM portfolio WHERE id = :id";
-pub(crate) const SELECT_ACCOUNT_SQL: &'static str = "SELECT id, name, currency, asset_location, asset_type FROM account where chat_id = :chat_id";
-pub(crate) const SELECT_BALANCE_SQL: &'static str = "SELECT id, amount, category, date FROM balance where account_id = :account_id";
+pub(crate) const SELECT_PORTFOLIO_SQL: &'static str =
+    "SELECT base_currency, exchange_rate FROM portfolio WHERE id = :id";
+pub(crate) const SELECT_ACCOUNT_SQL: &'static str =
+    "SELECT id, name, currency, asset_location, asset_type FROM account where chat_id = :chat_id";
+pub(crate) const SELECT_BALANCE_SQL: &'static str =
+    "SELECT id, amount, category, date FROM balance where account_id = :account_id";
 
 pub(crate) const DELETE_ACCOUNT_SQL: &'static str = "DELETE FROM account where id = :id";

@@ -1,10 +1,12 @@
+use crate::db::database::db_account::DataBaseAccount;
+use crate::enums::asset_type::AssetType;
+use crate::{
+    get_or_create_portfolio, goto_start, invalid_input_for_callback, HandlerResult, MyDialogue,
+};
 use std::str::FromStr;
-use teloxide::Bot;
 use teloxide::dispatching::dialogue::GetChatId;
 use teloxide::prelude::{CallbackQuery, Requester};
-use crate::enums::asset_type::AssetType;
-use crate::{get_or_create_portfolio, goto_start, invalid_input_for_callback, HandlerResult, MyDialogue};
-use crate::db::database::db_account::DataBaseAccount;
+use teloxide::Bot;
 
 pub struct ButtonType {}
 
@@ -35,11 +37,25 @@ pub async fn handler_type_btn(
         account.set_type(_type.clone());
         account.save(chat_id)?;
 
-        bot.edit_message_text(chat_id, q.message.clone().unwrap().id(), format!("Тип счета успешно обновлен на {}", _type)).await?;
+        bot.edit_message_text(
+            chat_id,
+            q.message.clone().unwrap().id(),
+            format!("Тип счета успешно обновлен на {}", _type),
+        )
+        .await?;
 
         goto_start(bot, dialogue, chat_id, None).await?;
     } else {
-        invalid_input_for_callback(bot, dialogue, q, format!("Необходимо выбрать одну из кнопок {:?}", ButtonType::get_types())).await?;
+        invalid_input_for_callback(
+            bot,
+            dialogue,
+            q,
+            format!(
+                "Необходимо выбрать одну из кнопок {:?}",
+                ButtonType::get_types()
+            ),
+        )
+        .await?;
     }
     Ok(())
 }

@@ -1,11 +1,11 @@
-use std::collections::HashMap;
-use chrono::{Days, Utc};
-use itertools::Itertools;
-use teloxide::types::InputFile;
 use crate::charts::pie_chart::{PieChart, PiePiece};
 use crate::db::portfolio::Portfolio;
 use crate::enums::category::Category;
 use crate::utils::common::total_sum_spaced;
+use chrono::{Days, Utc};
+use itertools::Itertools;
+use std::collections::HashMap;
+use teloxide::types::InputFile;
 
 pub trait DrawPie {
     fn draw_pie_name_allocations(&self) -> InputFile;
@@ -30,21 +30,35 @@ impl DrawPie for Portfolio {
     }
 
     fn draw_pie_spends(&self, account_name: String, num_days: u32) -> InputFile {
-        let week_threshold = Utc::now().checked_sub_days(Days::new(num_days as u64)).unwrap();
-        let account = self.get_all_accounts().iter().find(|account| account.get_name() == account_name).unwrap();
+        let week_threshold = Utc::now()
+            .checked_sub_days(Days::new(num_days as u64))
+            .unwrap();
+        let account = self
+            .get_all_accounts()
+            .iter()
+            .find(|account| account.get_name() == account_name)
+            .unwrap();
 
         let mut distribution_spends: HashMap<String, u32> = HashMap::new();
         for (balance_prev, balance) in account.get_balances().into_iter().tuple_windows() {
             let spend = balance_prev.get_amount() as i32 - balance.get_amount() as i32;
             if spend > 0 && balance.get_date() > week_threshold {
                 distribution_spends
-                    .entry(balance.get_category().map(|c| c.to_string()).unwrap_or(Category::default().to_string()))
+                    .entry(
+                        balance
+                            .get_category()
+                            .map(|c| c.name())
+                            .unwrap_or(Category::default().to_string()),
+                    )
                     .and_modify(|sum| *sum += spend as u32)
                     .or_insert(spend as u32);
             }
         }
 
-        Self::draw_pie_from_distribution(distribution_spends, &format!("Траты за {} дней", num_days))
+        Self::draw_pie_from_distribution(
+            distribution_spends,
+            &format!("Траты за {} дней", num_days),
+        )
     }
 
     fn draw_pie_type_allocations(&self) -> InputFile {
@@ -88,7 +102,10 @@ impl DrawPie for Portfolio {
         let mut total_summ = 0;
         for (key, value) in distribution {
             total_summ += value;
-            parts.push(PiePiece { size: value as f64, label: key });
+            parts.push(PiePiece {
+                size: value as f64,
+                label: key,
+            });
         }
 
         PieChart::create(parts, title, Some(total_sum_spaced(total_summ)))

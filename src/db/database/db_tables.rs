@@ -1,5 +1,7 @@
+use crate::db::database::query::{
+    CREATE_ACCOUNT_SQL, CREATE_BALANCE_SQL, CREATE_PORTFOLIO_SQL, DB_NAME,
+};
 use rusqlite::Connection;
-use crate::db::database::query::{CREATE_ACCOUNT_SQL, CREATE_BALANCE_SQL, CREATE_PORTFOLIO_SQL, DB_NAME};
 
 type HandlerResult<T> = rusqlite::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
