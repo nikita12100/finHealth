@@ -15,15 +15,15 @@ use teloxide::Bot;
 pub struct GetPortfolioButtons {}
 
 impl GetPortfolioButtons {
-    pub const DRAW_NAME_ALLOCATIONS: &'static str = "Срез по имени баланса";
-    pub const DRAW_CURRENCY_ALLOCATIONS: &'static str = "Срез по валютам актива";
-    pub const DRAW_LOCATION_ALLOCATIONS: &'static str = "Срез по хранению актива";
-    pub const DRAW_TYPE_ALLOCATIONS: &'static str = "Срез по типу актива";
-    pub const DRAW_WEEK_SPENDS: &'static str = "Срез дейли трат за неделю";
-    pub const DRAW_MONTH_SPENDS: &'static str = "Срез дейли трат за месяц";
-    pub const DRAW_LINE_ALL_HIST: &'static str = "Историчность по всем счетам";
+    pub const DRAW_NAME_ALLOCATIONS: &'static str = "🍕 Срез по имени баланса";
+    pub const DRAW_CURRENCY_ALLOCATIONS: &'static str = "🍕 Срез по валютам актива";
+    pub const DRAW_LOCATION_ALLOCATIONS: &'static str = "🍕 Срез по хранению актива";
+    pub const DRAW_TYPE_ALLOCATIONS: &'static str = "🍕 Срез по типу актива";
+    pub const DRAW_WEEK_SPENDS: &'static str = "🍕 Срез дейли трат за неделю";
+    pub const DRAW_MONTH_SPENDS: &'static str = "🍕 Срез дейли трат за месяц";
+    pub const DRAW_LINE_ALL_HIST: &'static str = "📊 Историчность по всем счетам";
     // pub const DRAW_CURRENT_ALLOCATIONS: &'static str = "Показать траты за все время по балансу";
-    pub const RAW_BALANCE: &'static str = "[DEV] Показать сырой баланс";
+    pub const RAW_BALANCE: &'static str = "⚙️ [DEV] Показать сырой баланс";
 
     pub const VALUES: &'static [&'static str; 8] = &[
         Self::DRAW_NAME_ALLOCATIONS,
@@ -149,7 +149,8 @@ pub async fn handler_get_portfolio_btn(
                     .await?;
                 bot.send_message(chat_id, format!("{:#?}", portfolio.get_exchange_rate()))
                     .await?;
-                bot.send_message(chat_id, format!("{:#?}", portfolio.get_all_accounts()))
+                let accounts: Vec<String> = portfolio.get_all_accounts().iter().map(|a| a.print()).collect::<Vec<_>>();
+                bot.send_message(chat_id, format!("{:#?}", accounts))
                     .await?;
 
                 goto_start(bot, dialogue, chat_id, None).await?;

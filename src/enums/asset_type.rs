@@ -5,17 +5,17 @@ use strum_macros::{Display, EnumString, IntoStaticStr};
 #[derive(Clone, Debug, Default, PartialEq, Display, EnumString, IntoStaticStr)]
 pub enum AssetType {
     #[default]
-    #[strum(serialize = "cash")]
+    #[strum(serialize = "💵 cash")]
     Cash = 0,
-    #[strum(serialize = "crypto")]
+    #[strum(serialize = "₿ crypto")]
     Crypto = 1,
     #[strum(serialize = "repo")]
     Repo = 2,
-    #[strum(serialize = "gold")]
+    #[strum(serialize = "🧈 gold")]
     Gold = 3,
-    #[strum(serialize = "deposit")]
+    #[strum(serialize = "🏦 deposit")]
     Deposit = 4,
-    #[strum(serialize = "share")]
+    #[strum(serialize = "🚀 share")]
     Share = 5,
     #[strum(serialize = "bond")]
     Bond = 6,

@@ -1,5 +1,6 @@
 .idea
 Cargo.lock
 /target
+src/.DS_Store
 *.sqllite
 *.db

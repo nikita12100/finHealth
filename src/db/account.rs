@@ -151,4 +151,11 @@ impl Account {
     pub fn get_balances(&self) -> Vec<BalanceTimed> {
         self.balance.clone()
     }
+
+    pub fn print(&self) -> String {
+        format!("\
+        Баланс {} итог {} {}\
+        ", self.name, self.get_last_amount().unwrap_or(0), self.get_currency())
+        .to_string()
+    }
 }
