@@ -111,3 +111,16 @@ impl DrawPie for Portfolio {
         PieChart::create(parts, title, Some(total_sum_spaced(total_summ)))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::charts::draw_pie::DrawPie;
+    use crate::utils::mock_data::MockData;
+
+    #[test]
+    fn fails_when_draw() {
+        let portfolio = MockData::create();
+        portfolio.draw_pie_name_allocations();
+        assert_eq!(1, 1);
+    }
+}
